@@ -145,7 +145,7 @@ p {
 
 .brand {
   display: block;
-  width: clamp(134px, 14vw, 182px);
+  width: clamp(67px, 7vw, 91px);
   aspect-ratio: 1 / 1;
   padding: 0;
   border-radius: 14px;
@@ -541,7 +541,7 @@ p {
 
 .footer-brand {
   display: block;
-  width: 125px;
+  width: 62.5px;
   aspect-ratio: 1 / 1;
   border-radius: 10px;
   background: linear-gradient(145deg, rgba(238, 247, 255, 0.95), rgba(198, 216, 230, 0.85));

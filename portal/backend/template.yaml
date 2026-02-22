@@ -1,0 +1,282 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Jobs Portal Backend - Spring Boot Fat Lambda
+
+Parameters:
+  CognitoUserPoolId:
+    Type: String
+    Description: Cognito User Pool ID
+  CognitoUserPoolClientId:
+    Type: String
+    Description: Cognito User Pool Client ID
+  DsqlEndpoint:
+    Type: String
+    Description: Aurora DSQL cluster endpoint
+  DsqlDatabase:
+    Type: String
+    Default: postgres
+    Description: Aurora DSQL database name
+  DsqlDbUser:
+    Type: String
+    Default: app_user
+    Description: Aurora DSQL database user
+
+Resources:
+
+  DepsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: jobs-portal-deps
+      Description: Dependencies for Jobs Portal Lambda
+      ContentUri: target/layer/
+      CompatibleRuntimes:
+        - java17
+
+  PortalFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: jobs-portal-lambda-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: lambda-logs-and-dsql-access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+              - Effect: Allow
+                Action:
+                  - dsql:DbConnect
+                  - dsql:ExecuteStatement
+                  - dsql:BeginTransaction
+                  - dsql:CommitTransaction
+                  - dsql:RollbackTransaction
+                Resource: "*"
+
+  PortalHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            IdentitySource: "$request.header.Authorization"
+            JwtConfiguration:
+              issuer: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPoolId}"
+              audience:
+                - !Ref CognitoUserPoolClientId
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+        AllowMethods:
+          - GET
+          - PUT
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+
+  PortalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: jobs-portal-crud
+      Role: !GetAtt PortalFunctionRole.Arn
+      Runtime: java17
+      Handler: org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest
+      CodeUri: target/jobs-portal-backend-1.0.0.jar
+      MemorySize: 1769
+      Timeout: 100
+      SnapStart:
+        ApplyOn: PublishedVersions
+      AutoPublishAlias: live
+      Layers:
+        - !Ref DepsLayer
+      Environment:
+        Variables:
+          MAIN_CLASS: com.portal.Application
+          SPRING_CLOUD_FUNCTION_DEFINITION: apiRouter
+          COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
+          COGNITO_USER_POOL_CLIENT_ID: !Ref CognitoUserPoolClientId
+          DSQL_ENDPOINT: !Ref DsqlEndpoint
+          DSQL_DATABASE: !Ref DsqlDatabase
+          DSQL_DB_USER: !Ref DsqlDbUser
+      Events:
+        # User routes
+        PutUser:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/user
+            Method: PUT
+        GetUser:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/user
+            Method: GET
+        DeleteUser:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/user
+            Method: DELETE
+        GetUserList:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/userlist
+            Method: GET
+
+        # Candidate routes
+        PutCandidate:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/candidate
+            Method: PUT
+        GetCandidate:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/candidate
+            Method: GET
+        DeleteCandidate:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/candidate
+            Method: DELETE
+        GetCandidateList:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/candidatelist
+            Method: GET
+        DisableCandidate:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/candidate/disable
+            Method: PUT
+        EnableCandidate:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/candidate/enable
+            Method: PUT
+
+        # Company routes
+        PutCompany:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/company
+            Method: PUT
+        GetCompany:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/company
+            Method: GET
+        DeleteCompany:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/company
+            Method: DELETE
+        GetCompanyList:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/companylist
+            Method: GET
+        DisableCompany:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/company/disable
+            Method: PUT
+        EnableCompany:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/company/enable
+            Method: PUT
+
+        # Job routes
+        PutJob:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/job
+            Method: PUT
+        GetJob:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/job
+            Method: GET
+        DeleteJob:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/job
+            Method: DELETE
+        GetJobList:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/joblist
+            Method: GET
+
+        # Job Application routes
+        PutJobApplication:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/jobapplication
+            Method: PUT
+        GetJobApplication:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/jobapplication
+            Method: GET
+        DeleteJobApplication:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/jobapplication
+            Method: DELETE
+        GetJobApplicationList:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/jobapplicationlist
+            Method: GET
+        UpdateJobApplicationStatus:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref PortalHttpApi
+            Path: /api/jobapplication/status
+            Method: PUT
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway URL
+    Value: !Sub "https://${PortalHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+  FunctionArn:
+    Description: Lambda Function ARN
+    Value: !GetAtt PortalFunction.Arn

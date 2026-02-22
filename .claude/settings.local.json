@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(test:*)",
+      "Bash(mvn compile:*)",
+      "Bash(aws dsql generate-db-connect-admin-auth-token:*)",
+      "Bash(\"C:\\\\Program Files\\\\PostgreSQL\\\\18\\\\bin\\\\psql.exe\" \"host=xztsdc4rle4zv5v3rb3hwyoebe.dsql.us-east-1.on.aws port=5432 dbname=postgres user=admin sslmode=require\" -f \"f:\\\\src\\\\tnsaino\\\\portal\\\\backend\\\\src\\\\main\\\\resources\\\\db\\\\seed\\\\V2__seed_data.sql\")",
+      "Bash(npm install:*)"
+    ]
+  }
+}
