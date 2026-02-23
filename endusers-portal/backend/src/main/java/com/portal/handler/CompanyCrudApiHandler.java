@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.portal.dto.Company;
 import com.portal.service.CompanyService;
+import com.portal.service.PhotoPresignService;
 import com.portal.util.ApiGatewayRequestParser;
 import com.portal.util.ApiResponseFactory;
 import org.springframework.stereotype.Component;
@@ -17,15 +18,22 @@ public class CompanyCrudApiHandler {
 
     private static final String ROUTE_PUT_COMPANY = "PUT /api/company";
     private static final String ROUTE_GET_COMPANY = "GET /api/company";
+    private static final String ROUTE_GET_LOGO_UPLOAD = "GET /api/company/logo/upload-url";
+    private static final String ROUTE_GET_LOGO_DOWNLOAD = "GET /api/company/logo/download-url";
 
-    private static final Set<String> HANDLED_ROUTES = Set.of(ROUTE_PUT_COMPANY, ROUTE_GET_COMPANY);
+    private static final Set<String> HANDLED_ROUTES = Set.of(
+            ROUTE_PUT_COMPANY, ROUTE_GET_COMPANY,
+            ROUTE_GET_LOGO_UPLOAD, ROUTE_GET_LOGO_DOWNLOAD);
 
     private final CompanyService companyService;
+    private final PhotoPresignService photoPresignService;
     private final ApiResponseFactory responseFactory;
     private final ApiGatewayRequestParser requestParser;
 
-    public CompanyCrudApiHandler(CompanyService companyService, ApiResponseFactory responseFactory, ApiGatewayRequestParser requestParser) {
+    public CompanyCrudApiHandler(CompanyService companyService, PhotoPresignService photoPresignService,
+                                 ApiResponseFactory responseFactory, ApiGatewayRequestParser requestParser) {
         this.companyService = companyService;
+        this.photoPresignService = photoPresignService;
         this.responseFactory = responseFactory;
         this.requestParser = requestParser;
     }
@@ -46,6 +54,16 @@ public class CompanyCrudApiHandler {
                 yield handlePut(event);
             }
             case ROUTE_GET_COMPANY -> handleGet(event);
+            case ROUTE_GET_LOGO_UPLOAD -> {
+                if (!"COMPANY".equals(role))
+                    yield responseFactory.forbidden("Company access required");
+                yield handleLogoUploadUrl(event);
+            }
+            case ROUTE_GET_LOGO_DOWNLOAD -> {
+                if (!"COMPANY".equals(role))
+                    yield responseFactory.forbidden("Company access required");
+                yield handleLogoDownloadUrl(event);
+            }
             default -> responseFactory.notFound("Route not found");
         };
     }
@@ -66,13 +84,45 @@ public class CompanyCrudApiHandler {
 
     private APIGatewayV2HTTPResponse handleGet(APIGatewayV2HTTPEvent event) {
         String id = requestParser.readQueryParam(event, "id");
-        if (id == null || id.isBlank()) return responseFactory.badRequest("Query parameter 'id' is required");
+        String userId = requestParser.readQueryParam(event, "userId");
+        if ((id == null || id.isBlank()) && (userId == null || userId.isBlank()))
+            return responseFactory.badRequest("Query parameter 'id' or 'userId' is required");
         try {
-            Company company = companyService.findById(id);
+            Company company = (id != null && !id.isBlank())
+                    ? companyService.findById(id)
+                    : companyService.findByUserId(userId);
             if (company == null) return responseFactory.notFound("Company not found");
             return responseFactory.ok(company);
         } catch (IllegalArgumentException e) {
             return responseFactory.badRequest(e.getMessage());
+        }
+    }
+
+    private APIGatewayV2HTTPResponse handleLogoUploadUrl(APIGatewayV2HTTPEvent event) {
+        String callerSub = requestParser.readUserId(event);
+        if (callerSub == null || callerSub.isBlank())
+            return responseFactory.forbidden("Unable to identify caller");
+        String contentType = requestParser.readQueryParam(event, "contentType");
+        if (contentType == null || contentType.isBlank()) contentType = "image/jpeg";
+        try {
+            String uploadUrl = photoPresignService.generateLogoUploadUrl(callerSub, contentType);
+            return responseFactory.ok(Map.of("uploadUrl", uploadUrl, "key", "companies/" + callerSub + "/logo"));
+        } catch (Exception e) {
+            return responseFactory.serverError("Failed to generate upload URL: " + e.getMessage());
+        }
+    }
+
+    private APIGatewayV2HTTPResponse handleLogoDownloadUrl(APIGatewayV2HTTPEvent event) {
+        String callerSub = requestParser.readUserId(event);
+        if (callerSub == null || callerSub.isBlank())
+            return responseFactory.forbidden("Unable to identify caller");
+        try {
+            if (!photoPresignService.logoExists(callerSub))
+                return responseFactory.notFound("No logo uploaded");
+            String downloadUrl = photoPresignService.generateLogoDownloadUrl(callerSub);
+            return responseFactory.ok(Map.of("downloadUrl", downloadUrl));
+        } catch (Exception e) {
+            return responseFactory.serverError("Failed to generate download URL: " + e.getMessage());
         }
     }
 

@@ -12,6 +12,12 @@ const styles = {
   value: { fontSize: '0.95rem', color: '#1e293b', padding: '0.4rem 0' },
   valueEmpty: { fontSize: '0.9rem', color: '#9ca3af', fontStyle: 'italic', padding: '0.4rem 0' },
   linkValue: { color: '#2563eb', textDecoration: 'none', fontSize: '0.95rem', padding: '0.4rem 0', display: 'inline-block' },
+  logoImg: { width: '120px', height: '120px', objectFit: 'contain', border: '1px solid #e2e8f0', borderRadius: '8px', backgroundColor: '#f8fafc', padding: '0.25rem' },
+  logoPlaceholder: { width: '120px', height: '120px', borderRadius: '8px', backgroundColor: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px dashed #d1d5db', color: '#9ca3af', fontSize: '0.75rem', textAlign: 'center' },
+  logoSection: { gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '0.5rem' },
+  uploadBtn: { padding: '0.4rem 1rem', backgroundColor: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' },
+  uploadHint: { fontSize: '0.8rem', color: '#6b7280', marginTop: '0.25rem' },
+  uploading: { fontSize: '0.85rem', color: '#6b7280' },
   input: { width: '100%', padding: '0.6rem', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '0.9rem' },
   textarea: { width: '100%', padding: '0.6rem', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '0.9rem', minHeight: '80px', resize: 'vertical' },
   badge: { padding: '0.2rem 0.6rem', borderRadius: '999px', fontSize: '0.75rem', fontWeight: '500' },
@@ -38,7 +44,6 @@ const fields = [
   { key: 'hrContactEmail', label: 'HR Contact Email', type: 'email' },
   { key: 'legalContactName', label: 'Legal Contact Name' },
   { key: 'legalContactEmail', label: 'Legal Contact Email', type: 'email' },
-  { key: 'logoUrl', label: 'Logo URL', isLink: true },
   { key: 'details', label: 'Details', fullWidth: true, multiline: true },
 ];
 
@@ -50,6 +55,8 @@ export default function CompanyDetail() {
   const [form, setForm] = useState({});
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
+  const [logoUrl, setLogoUrl] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => { fetchCompany(); }, [id]);
 
@@ -61,12 +68,44 @@ export default function CompanyDetail() {
         name: res.data.name || '', corporateWebsite: res.data.corporateWebsite || '',
         hrContactName: res.data.hrContactName || '', hrContactEmail: res.data.hrContactEmail || '',
         legalContactName: res.data.legalContactName || '', legalContactEmail: res.data.legalContactEmail || '',
-        logoUrl: res.data.logoUrl || '', details: res.data.details || '',
+        details: res.data.details || '',
       });
+      if (res.data.userId) {
+        fetchLogo(res.data.userId);
+      }
     } catch (err) {
       console.error('Failed to fetch company', err);
     }
     setLoading(false);
+  };
+
+  const fetchLogo = async (userId) => {
+    try {
+      const res = await axiosClient.get(`/api/company/logo/download-url?userId=${userId}`);
+      setLogoUrl(res.data.downloadUrl);
+    } catch {
+      setLogoUrl(null);
+    }
+  };
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !company?.userId) return;
+    setUploading(true);
+    setMessage(null);
+    try {
+      const res = await axiosClient.get(`/api/company/logo/upload-url?userId=${company.userId}&contentType=${encodeURIComponent(file.type)}`);
+      await fetch(res.data.uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      });
+      setLogoUrl(URL.createObjectURL(file));
+      setMessage({ type: 'success', text: 'Logo uploaded successfully!' });
+    } catch {
+      setMessage({ type: 'error', text: 'Failed to upload logo' });
+    }
+    setUploading(false);
   };
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -129,6 +168,13 @@ export default function CompanyDetail() {
             <div style={styles.section}>
               <h2 style={styles.sectionTitle}>Company Information</h2>
               <div style={styles.grid}>
+                <div style={styles.logoSection}>
+                  {logoUrl ? (
+                    <img src={logoUrl} alt="Company Logo" style={styles.logoImg} />
+                  ) : (
+                    <div style={styles.logoPlaceholder}>No Logo</div>
+                  )}
+                </div>
                 {fields.map((f) => (
                   <div key={f.key} style={{ ...styles.field, ...(f.fullWidth ? styles.fullWidth : {}) }}>
                     <label style={styles.label}>{f.label}</label>
@@ -155,6 +201,26 @@ export default function CompanyDetail() {
         ) : (
           <form onSubmit={handleSubmit}>
             <div style={styles.grid}>
+              <div style={styles.logoSection}>
+                {logoUrl ? (
+                  <img src={logoUrl} alt="Company Logo" style={styles.logoImg} />
+                ) : (
+                  <div style={styles.logoPlaceholder}>No Logo</div>
+                )}
+                <div>
+                  {uploading ? (
+                    <span style={styles.uploading}>Uploading...</span>
+                  ) : (
+                    <>
+                      <label style={styles.uploadBtn}>
+                        {logoUrl ? 'Change Logo' : 'Upload Logo'}
+                        <input type="file" accept="image/*" onChange={handleLogoUpload} style={{ display: 'none' }} />
+                      </label>
+                      <div style={styles.uploadHint}>PNG, JPG, SVG up to 5MB</div>
+                    </>
+                  )}
+                </div>
+              </div>
               {fields.map((f) => (
                 <div key={f.key} style={{ ...styles.field, ...(f.fullWidth ? styles.fullWidth : {}) }}>
                   <label style={styles.label}>{f.label}{f.required ? ' *' : ''}</label>

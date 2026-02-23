@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { confirmSignUp } from 'aws-amplify/auth';
 import { useAuth } from '../../context/AuthContext';
 
@@ -121,7 +121,7 @@ export default function Register() {
         )}
 
         <div style={styles.link}>
-          Already have an account? <a href="/login">Login</a>
+          Already have an account? <Link to="/login">Login</Link>
         </div>
       </div>
     </div>

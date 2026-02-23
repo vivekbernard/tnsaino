@@ -67,6 +67,12 @@ Resources:
                   - s3:GetObject
                   - s3:HeadObject
                 Resource: arn:aws:s3:::tnsaino-canidate-artifacts/candidates/*
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:HeadObject
+                  - s3:PutObject
+                Resource: arn:aws:s3:::tnsaino-canidate-artifacts/companies/*
 
   AdminHttpApi:
     Type: AWS::Serverless::HttpApi
@@ -220,6 +226,18 @@ Resources:
             ApiId: !Ref AdminHttpApi
             Path: /api/company/enable
             Method: PUT
+        GetCompanyLogoUploadUrl:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/company/logo/upload-url
+            Method: GET
+        GetCompanyLogoDownloadUrl:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/company/logo/download-url
+            Method: GET
 
         # Job admin routes
         PutJob:

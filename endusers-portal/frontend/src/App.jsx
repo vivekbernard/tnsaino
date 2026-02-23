@@ -17,6 +17,7 @@ import MyApplications from './pages/candidate/MyApplications';
 
 // Company pages
 import CompanyDashboard from './pages/company/CompanyDashboard';
+import CompanyProfile from './pages/company/CompanyProfile';
 import CreateJob from './pages/company/CreateJob';
 import ManageJobs from './pages/company/ManageJobs';
 import ViewApplicants from './pages/company/ViewApplicants';
@@ -46,6 +47,9 @@ export default function App() {
         {/* Company routes */}
         <Route path="/company/dashboard" element={
           <ProtectedRoute allowedRoles={['COMPANY']}><CompanyDashboard /></ProtectedRoute>
+        } />
+        <Route path="/company/profile" element={
+          <ProtectedRoute allowedRoles={['COMPANY']}><CompanyProfile /></ProtectedRoute>
         } />
         <Route path="/company/jobs/create" element={
           <ProtectedRoute allowedRoles={['COMPANY']}><CreateJob /></ProtectedRoute>

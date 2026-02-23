@@ -23,7 +23,9 @@ export default function Navbar() {
     <nav style={styles.nav}>
       <Link to="/" style={styles.brand}>Jobs Portal</Link>
       <div style={styles.links}>
-        <Link to="/jobs" style={styles.link}>Browse Jobs</Link>
+        <Link to="/" style={styles.link}>Home</Link>
+
+        {isAuthenticated && <Link to="/jobs" style={styles.link}>Browse Jobs</Link>}
 
         {!isAuthenticated && (
           <>
@@ -45,6 +47,7 @@ export default function Navbar() {
             <Link to="/company/dashboard" style={styles.link}>Dashboard</Link>
             <Link to="/company/jobs" style={styles.link}>Manage Jobs</Link>
             <Link to="/company/jobs/create" style={styles.link}>Post Job</Link>
+            <Link to="/company/profile" style={styles.link}>My Profile</Link>
           </>
         )}
 

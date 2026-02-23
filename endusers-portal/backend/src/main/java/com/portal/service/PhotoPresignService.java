@@ -32,6 +32,10 @@ public class PhotoPresignService {
         return "candidates/" + userId + "/photo";
     }
 
+    private String logoKey(String userId) {
+        return "companies/" + userId + "/logo";
+    }
+
     public String generateUploadUrl(String userId, String contentType) {
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
@@ -58,13 +62,46 @@ public class PhotoPresignService {
     }
 
     public boolean photoExists(String userId) {
+        return objectExists(photoKey(userId));
+    }
+
+    public String generateLogoUploadUrl(String userId, String contentType) {
+        PutObjectRequest objectRequest = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(logoKey(userId))
+                .contentType(contentType)
+                .build();
+        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                .signatureDuration(URL_EXPIRY)
+                .putObjectRequest(objectRequest)
+                .build();
+        return presigner.presignPutObject(presignRequest).url().toString();
+    }
+
+    public String generateLogoDownloadUrl(String userId) {
+        GetObjectRequest objectRequest = GetObjectRequest.builder()
+                .bucket(bucket)
+                .key(logoKey(userId))
+                .build();
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(URL_EXPIRY)
+                .getObjectRequest(objectRequest)
+                .build();
+        return presigner.presignGetObject(presignRequest).url().toString();
+    }
+
+    public boolean logoExists(String userId) {
+        return objectExists(logoKey(userId));
+    }
+
+    private boolean objectExists(String key) {
         try {
             var s3Client = software.amazon.awssdk.services.s3.S3Client.builder()
                     .region(region)
                     .build();
             s3Client.headObject(HeadObjectRequest.builder()
                     .bucket(bucket)
-                    .key(photoKey(userId))
+                    .key(key)
                     .build());
             return true;
         } catch (Exception e) {

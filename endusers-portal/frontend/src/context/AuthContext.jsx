@@ -26,6 +26,14 @@ export function AuthProvider({ children }) {
           // No candidate profile yet — that's fine
         }
       }
+      if (role === 'COMPANY' && sub) {
+        try {
+          const res = await axiosClient.get(`/api/company?userId=${sub}`);
+          linkedEntityId = res.data?.id || null;
+        } catch {
+          // No company profile yet — that's fine
+        }
+      }
 
       setUser({
         username: currentUser.username,

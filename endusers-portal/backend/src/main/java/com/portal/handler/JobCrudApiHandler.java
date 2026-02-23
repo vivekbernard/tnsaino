@@ -3,7 +3,9 @@ package com.portal.handler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.portal.dto.Company;
 import com.portal.dto.Job;
+import com.portal.service.CompanyService;
 import com.portal.service.JobService;
 import com.portal.util.ApiGatewayRequestParser;
 import com.portal.util.ApiResponseFactory;
@@ -22,11 +24,14 @@ public class JobCrudApiHandler {
     private static final Set<String> HANDLED_ROUTES = Set.of(ROUTE_PUT_JOB, ROUTE_GET_JOB, ROUTE_GET_JOB_LIST);
 
     private final JobService jobService;
+    private final CompanyService companyService;
     private final ApiResponseFactory responseFactory;
     private final ApiGatewayRequestParser requestParser;
 
-    public JobCrudApiHandler(JobService jobService, ApiResponseFactory responseFactory, ApiGatewayRequestParser requestParser) {
+    public JobCrudApiHandler(JobService jobService, CompanyService companyService,
+                             ApiResponseFactory responseFactory, ApiGatewayRequestParser requestParser) {
         this.jobService = jobService;
+        this.companyService = companyService;
         this.responseFactory = responseFactory;
         this.requestParser = requestParser;
     }
@@ -81,8 +86,22 @@ public class JobCrudApiHandler {
     private APIGatewayV2HTTPResponse handleList(APIGatewayV2HTTPEvent event) {
         int page = requestParser.readIntQueryParam(event, "page", 0);
         int size = requestParser.readIntQueryParam(event, "size", 20);
-        String companyId = requestParser.readQueryParam(event, "companyId");
         String status = requestParser.readQueryParam(event, "status");
+        String role = requestParser.readUserRole(event);
+
+        String companyId;
+        if ("COMPANY".equals(role)) {
+            String callerSub = requestParser.readUserId(event);
+            if (callerSub == null || callerSub.isBlank())
+                return responseFactory.forbidden("Unable to identify caller");
+            Company company = companyService.findByUserId(callerSub);
+            if (company == null)
+                return responseFactory.notFound("Company profile not found");
+            companyId = company.id();
+        } else {
+            companyId = requestParser.readQueryParam(event, "companyId");
+        }
+
         return responseFactory.ok(jobService.listJobs(page, size, companyId, status));
     }
 

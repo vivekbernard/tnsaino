@@ -67,7 +67,9 @@ Resources:
                   - s3:PutObject
                   - s3:GetObject
                   - s3:HeadObject
-                Resource: arn:aws:s3:::tnsaino-canidate-artifacts/candidates/*
+                Resource:
+                  - arn:aws:s3:::tnsaino-canidate-artifacts/candidates/*
+                  - arn:aws:s3:::tnsaino-canidate-artifacts/companies/*
 
   EnduserHttpApi:
     Type: AWS::Serverless::HttpApi
@@ -174,6 +176,18 @@ Resources:
           Properties:
             ApiId: !Ref EnduserHttpApi
             Path: /api/company
+            Method: GET
+        GetLogoUploadUrl:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/company/logo/upload-url
+            Method: GET
+        GetLogoDownloadUrl:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/company/logo/download-url
             Method: GET
 
         # Job routes

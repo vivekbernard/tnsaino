@@ -12,6 +12,8 @@ import SoftDeletedView from './pages/admin/SoftDeletedView';
 import CandidateDetail from './pages/admin/CandidateDetail';
 import CompanyDetail from './pages/admin/CompanyDetail';
 import JobDetail from './pages/admin/JobDetail';
+import AllUsers from './pages/admin/AllUsers';
+import UserDetail from './pages/admin/UserDetail';
 
 function RequireAuth({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -32,6 +34,8 @@ export default function App() {
         <Route path="/companies/:id" element={<RequireAuth><CompanyDetail /></RequireAuth>} />
         <Route path="/jobs" element={<RequireAuth><AllJobs /></RequireAuth>} />
         <Route path="/jobs/:id" element={<RequireAuth><JobDetail /></RequireAuth>} />
+        <Route path="/users" element={<RequireAuth><AllUsers /></RequireAuth>} />
+        <Route path="/users/:id" element={<RequireAuth><UserDetail /></RequireAuth>} />
         <Route path="/deleted" element={<RequireAuth><SoftDeletedView /></RequireAuth>} />
       </Route>
     </Routes>
