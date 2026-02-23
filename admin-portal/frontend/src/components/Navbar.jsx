@@ -30,7 +30,7 @@ export default function Navbar() {
             <Link to="/companies" style={styles.link}>Companies</Link>
             <Link to="/jobs" style={styles.link}>Jobs</Link>
             <Link to="/deleted" style={styles.link}>Deleted</Link>
-            <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>{user?.username}</span>
+            <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>{user?.email}</span>
             <button onClick={handleLogout} style={styles.button}>Logout</button>
           </>
         )}

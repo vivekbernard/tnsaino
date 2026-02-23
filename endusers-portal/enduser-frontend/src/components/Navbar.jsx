@@ -50,7 +50,7 @@ export default function Navbar() {
 
         {isAuthenticated && (
           <>
-            <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>{user?.username} ({role})</span>
+            <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>{user?.email} ({role})</span>
             <button onClick={handleLogout} style={styles.button}>Logout</button>
           </>
         )}
