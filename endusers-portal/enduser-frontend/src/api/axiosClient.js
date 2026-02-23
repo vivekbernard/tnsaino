@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { fetchAuthSession } from 'aws-amplify/auth';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://0o1qd3ycw5.execute-api.us-east-1.amazonaws.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://qwdt5eu3ud.execute-api.us-east-1.amazonaws.com';
 
 const axiosClient = axios.create({
   baseURL: API_BASE_URL,

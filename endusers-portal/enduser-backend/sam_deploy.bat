@@ -1,1 +1,2 @@
-sam deploy --stack-name enduser-portal-stack --capabilities CAPABILITY_NAMED_IAM  --s3-bucket jobs-portal-iac-tsaino --parameter-overrides   CognitoUserPoolId=us-east-1_k78DebcwM   CognitoUserPoolClientId=697is3b35es7t337n52vg5cu3p  DsqlEndpoint=xztsdc4rle4zv5v3rb3hwyoebe.dsql.us-east-1.on.aws    DsqlDatabase=postgres DsqlDbUser=app_user
+call mvn package -P lambda-layer
+call sam deploy --stack-name enduser-portal-stack --capabilities CAPABILITY_NAMED_IAM  --s3-bucket jobs-portal-enduser-iac-tsaino --parameter-overrides   CognitoUserPoolId=us-east-1_k78DebcwM   CognitoUserPoolClientId=697is3b35es7t337n52vg5cu3p  DsqlEndpoint=xztsdc4rle4zv5v3rb3hwyoebe.dsql.us-east-1.on.aws    DsqlDatabase=postgres DsqlDbUser=app_user
