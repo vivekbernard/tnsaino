@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
 import { useAuth } from '../../context/AuthContext';
 import Pagination from '../../components/Pagination';
+import Spinner from '../../components/Spinner';
 
 const styles = {
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' },
@@ -23,9 +24,13 @@ export default function ManageJobs() {
   const [jobs, setJobs] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.linkedEntityId) fetchJobs();
+    if (user?.linkedEntityId) {
+      setLoading(true);
+      fetchJobs();
+    }
   }, [user, page]);
 
   const fetchJobs = async () => {
@@ -35,6 +40,8 @@ export default function ManageJobs() {
       setTotalPages(res.data.totalPages || 0);
     } catch (err) {
       console.error('Failed to fetch jobs', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -45,7 +52,9 @@ export default function ManageJobs() {
         <Link to="/company/jobs/create" style={styles.createBtn}>Post New Job</Link>
       </div>
 
-      {jobs.length === 0 ? (
+      {loading ? (
+        <Spinner text="Loading jobs..." />
+      ) : jobs.length === 0 ? (
         <div style={styles.empty}>No jobs posted yet.</div>
       ) : (
         <table style={styles.table}>

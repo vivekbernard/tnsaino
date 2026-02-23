@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
 import { useAuth } from '../../context/AuthContext';
+import Spinner from '../../components/Spinner';
 
 const styles = {
   title: { fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' },
@@ -54,14 +55,16 @@ export default function CompanyProfile() {
   const [message, setMessage] = useState(null);
   const [logoUrl, setLogoUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user?.linkedEntityId) {
-      fetchProfile();
-      fetchLogo();
+      setLoading(true);
+      Promise.all([fetchProfile(), fetchLogo()]).finally(() => setLoading(false));
     } else if (user) {
       setProfileId(crypto.randomUUID());
       setEditing(true);
+      setLoading(false);
     }
   }, [user]);
 
@@ -191,6 +194,10 @@ export default function CompanyProfile() {
       <h1 style={styles.title}>
         {isNewProfile ? 'Create Company Profile' : editing ? 'Edit Company Profile' : 'Company Profile'}
       </h1>
+
+      {!editing && !isNewProfile && loading && <Spinner text="Loading profile..." />}
+
+      {!loading && (
       <div style={styles.card}>
         {message && (
           <div style={{ ...styles.message, ...(message.type === 'success' ? styles.success : styles.error) }}>
@@ -237,6 +244,7 @@ export default function CompanyProfile() {
           </form>
         )}
       </div>
+      )}
     </div>
   );
 }

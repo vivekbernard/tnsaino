@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
 import Pagination from '../../components/Pagination';
+import Spinner from '../../components/Spinner';
 
 const styles = {
   header: { marginBottom: '1.5rem' },
@@ -29,10 +30,11 @@ export default function ViewApplicants() {
   const [applicants, setApplicants] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchJob();
-    fetchApplicants();
+    setLoading(true);
+    Promise.all([fetchJob(), fetchApplicants()]).finally(() => setLoading(false));
   }, [jobId, page]);
 
   const fetchJob = async () => {
@@ -71,7 +73,9 @@ export default function ViewApplicants() {
         {job && <div style={styles.jobInfo}>For: {job.title}</div>}
       </div>
 
-      {applicants.length === 0 ? (
+      {loading ? (
+        <Spinner text="Loading applicants..." />
+      ) : applicants.length === 0 ? (
         <div style={styles.empty}>No applicants yet.</div>
       ) : (
         <table style={styles.table}>

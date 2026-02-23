@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
+import Spinner from '../../components/Spinner';
 
 const styles = {
   title: { fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' },
@@ -53,8 +54,9 @@ export default function UserDetail() {
       });
     } catch (err) {
       console.error('Failed to fetch user', err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -86,7 +88,7 @@ export default function UserDetail() {
     fetchUser();
   };
 
-  if (loading) return <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Loading...</div>;
+  if (loading) return <Spinner text="Loading user..." />;
   if (!user) return <div style={{ padding: '2rem', textAlign: 'center', color: '#991b1b' }}>User not found.</div>;
 
   return (

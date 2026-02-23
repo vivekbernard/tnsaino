@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
 import Pagination from '../../components/Pagination';
+import Spinner from '../../components/Spinner';
 
 const styles = {
   header: { marginBottom: '2rem' },
@@ -27,12 +28,14 @@ export default function BrowseJobs() {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [statusFilter, setStatusFilter] = useState('OPEN');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchJobs();
   }, [page, statusFilter]);
 
   const fetchJobs = async () => {
+    setLoading(true);
     try {
       const params = new URLSearchParams({ page, size: 10 });
       if (statusFilter) params.append('status', statusFilter);
@@ -41,6 +44,8 @@ export default function BrowseJobs() {
       setTotalPages(res.data.totalPages || 0);
     } catch (err) {
       console.error('Failed to fetch jobs', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,6 +63,9 @@ export default function BrowseJobs() {
         </select>
       </div>
 
+      {loading ? (
+        <Spinner text="Loading jobs..." />
+      ) : (
       <div style={styles.grid}>
         {jobs.length === 0 && <div style={styles.empty}>No jobs found.</div>}
         {jobs.map((job) => (
@@ -76,6 +84,7 @@ export default function BrowseJobs() {
           </div>
         ))}
       </div>
+      )}
 
       <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
     </div>

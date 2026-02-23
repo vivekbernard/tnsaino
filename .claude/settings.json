@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(mvn clean package:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(find:*)"
     ],
     "additionalDirectories": [
       "F:\\src\\tnsaino\\enduser-backend\\src\\main\\java\\com\\portal",

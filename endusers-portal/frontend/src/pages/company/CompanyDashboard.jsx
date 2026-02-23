@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
 import { useAuth } from '../../context/AuthContext';
+import Spinner from '../../components/Spinner';
 
 const styles = {
   title: { fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' },
@@ -51,11 +52,12 @@ export default function CompanyDashboard() {
   const [company, setCompany] = useState(null);
   const [jobCount, setJobCount] = useState(0);
   const [openJobs, setOpenJobs] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user?.linkedEntityId) {
-      fetchCompany();
-      fetchJobStats();
+      setLoading(true);
+      Promise.all([fetchCompany(), fetchJobStats()]).finally(() => setLoading(false));
     }
   }, [user]);
 
@@ -93,7 +95,9 @@ export default function CompanyDashboard() {
         </div>
       )}
 
-      {user?.linkedEntityId && (
+      {user?.linkedEntityId && loading && <Spinner text="Loading dashboard..." />}
+
+      {user?.linkedEntityId && !loading && (
         <>
           <div style={styles.grid}>
             <div style={styles.card}>

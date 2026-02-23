@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
 import Pagination from '../../components/Pagination';
+import Spinner from '../../components/Spinner';
 
 const styles = {
   title: { fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' },
@@ -52,7 +53,7 @@ export default function AllUsers() {
     <div>
       <h1 style={styles.title}>All Users</h1>
       {loading ? (
-        <div style={styles.empty}>Loading...</div>
+        <Spinner text="Loading users..." />
       ) : users.length === 0 ? (
         <div style={styles.empty}>No users found.</div>
       ) : (

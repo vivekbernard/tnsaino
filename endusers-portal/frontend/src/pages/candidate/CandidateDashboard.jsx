@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
 import { useAuth } from '../../context/AuthContext';
+import Spinner from '../../components/Spinner';
 
 const styles = {
   title: { fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' },
@@ -45,11 +46,12 @@ export default function CandidateDashboard() {
   const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [appCount, setAppCount] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user?.linkedEntityId) {
-      fetchProfile();
-      fetchApplicationCount();
+      setLoading(true);
+      Promise.all([fetchProfile(), fetchApplicationCount()]).finally(() => setLoading(false));
     }
   }, [user]);
 
@@ -85,7 +87,9 @@ export default function CandidateDashboard() {
         </div>
       )}
 
-      {user?.linkedEntityId && (
+      {user?.linkedEntityId && loading && <Spinner text="Loading dashboard..." />}
+
+      {user?.linkedEntityId && !loading && (
         <>
           <div style={styles.grid}>
             <div style={styles.card}>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosClient from '../../api/axiosClient';
 import Pagination from '../../components/Pagination';
+import Spinner from '../../components/Spinner';
 
 const styles = {
   title: { fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' },
@@ -21,12 +22,14 @@ export default function SoftDeletedView() {
   const [records, setRecords] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchDeleted();
   }, [activeType, page]);
 
   const fetchDeleted = async () => {
+    setLoading(true);
     try {
       const endpoint = activeType === 'candidates' ? '/api/candidatelist'
         : activeType === 'companies' ? '/api/companylist'
@@ -38,6 +41,8 @@ export default function SoftDeletedView() {
       setTotalPages(res.data.totalPages || 0);
     } catch (err) {
       console.error('Failed to fetch deleted records', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,7 +71,9 @@ export default function SoftDeletedView() {
         ))}
       </div>
 
-      {records.length === 0 ? (
+      {loading ? (
+        <Spinner text="Loading deleted records..." />
+      ) : records.length === 0 ? (
         <div style={styles.empty}>No soft-deleted {activeType} found.</div>
       ) : (
         <table style={styles.table}>

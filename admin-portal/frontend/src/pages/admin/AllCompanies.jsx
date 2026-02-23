@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
 import Pagination from '../../components/Pagination';
+import Spinner from '../../components/Spinner';
 
 const styles = {
   title: { fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' },
@@ -22,16 +23,20 @@ export default function AllCompanies() {
   const [companies, setCompanies] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => { fetchCompanies(); }, [page]);
 
   const fetchCompanies = async () => {
+    setLoading(true);
     try {
       const res = await axiosClient.get(`/api/companylist?page=${page}&size=10`);
       setCompanies(res.data.content || []);
       setTotalPages(res.data.totalPages || 0);
     } catch (err) {
       console.error('Failed to fetch companies', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,7 +71,9 @@ export default function AllCompanies() {
   return (
     <div>
       <h1 style={styles.title}>All Companies</h1>
-      {companies.length === 0 ? (
+      {loading ? (
+        <Spinner text="Loading companies..." />
+      ) : companies.length === 0 ? (
         <div style={styles.empty}>No companies found.</div>
       ) : (
         <table style={styles.table}>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
 import Pagination from '../../components/Pagination';
+import Spinner from '../../components/Spinner';
 
 const styles = {
   title: { fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' },
@@ -22,16 +23,20 @@ export default function AllCandidates() {
   const [candidates, setCandidates] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => { fetchCandidates(); }, [page]);
 
   const fetchCandidates = async () => {
+    setLoading(true);
     try {
       const res = await axiosClient.get(`/api/candidatelist?page=${page}&size=10`);
       setCandidates(res.data.content || []);
       setTotalPages(res.data.totalPages || 0);
     } catch (err) {
       console.error('Failed to fetch candidates', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,7 +71,9 @@ export default function AllCandidates() {
   return (
     <div>
       <h1 style={styles.title}>All Candidates</h1>
-      {candidates.length === 0 ? (
+      {loading ? (
+        <Spinner text="Loading candidates..." />
+      ) : candidates.length === 0 ? (
         <div style={styles.empty}>No candidates found.</div>
       ) : (
         <table style={styles.table}>

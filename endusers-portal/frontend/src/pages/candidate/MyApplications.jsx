@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosClient from '../../api/axiosClient';
 import { useAuth } from '../../context/AuthContext';
 import Pagination from '../../components/Pagination';
+import Spinner from '../../components/Spinner';
 
 const styles = {
   title: { fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' },
@@ -23,25 +24,31 @@ export default function MyApplications() {
   const [applications, setApplications] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user?.linkedEntityId) fetchApplications();
   }, [user, page]);
 
   const fetchApplications = async () => {
+    setLoading(true);
     try {
       const res = await axiosClient.get(`/api/jobapplicationlist?candidateId=${user.linkedEntityId}&page=${page}&size=10`);
       setApplications(res.data.content || []);
       setTotalPages(res.data.totalPages || 0);
     } catch (err) {
       console.error('Failed to fetch applications', err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div>
       <h1 style={styles.title}>My Applications</h1>
-      {applications.length === 0 ? (
+      {loading ? (
+        <Spinner text="Loading applications..." />
+      ) : applications.length === 0 ? (
         <div style={styles.empty}>No applications yet. Browse jobs to get started!</div>
       ) : (
         <table style={styles.table}>

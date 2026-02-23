@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
 import { useAuth } from '../../context/AuthContext';
+import Spinner from '../../components/Spinner';
 
 const styles = {
   container: { maxWidth: '800px' },
@@ -28,6 +29,7 @@ export default function JobDetail() {
   const [job, setJob] = useState(null);
   const [message, setMessage] = useState(null);
   const [applying, setApplying] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchJob();
@@ -39,6 +41,8 @@ export default function JobDetail() {
       setJob(res.data);
     } catch (err) {
       console.error('Failed to fetch job', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,7 +62,7 @@ export default function JobDetail() {
     setApplying(false);
   };
 
-  if (!job) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>;
+  if (loading) return <Spinner text="Loading job details..." />;
 
   return (
     <div style={styles.container}>

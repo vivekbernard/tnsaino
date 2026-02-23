@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
+import Spinner from '../../components/Spinner';
 
 const styles = {
   title: { fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' },
@@ -60,10 +61,12 @@ const statCards = [
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({ candidates: 0, companies: 0, jobs: 0, users: 0 });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => { fetchStats(); }, []);
 
   const fetchStats = async () => {
+    setLoading(true);
     try {
       const [candidateRes, companyRes, jobRes, userRes] = await Promise.all([
         axiosClient.get('/api/candidatelist?page=0&size=1'),
@@ -79,6 +82,8 @@ export default function AdminDashboard() {
       });
     } catch (err) {
       console.error('Failed to fetch stats', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -86,30 +91,36 @@ export default function AdminDashboard() {
     <div>
       <h1 style={styles.title}>Admin Dashboard</h1>
 
-      <div style={styles.grid}>
-        {statCards.map(({ to, label, key, Icon, color, bg }) => (
-          <Link key={key} to={to} style={styles.card}>
-            <div style={styles.cardLeft}>
-              <div style={styles.cardLabel}>{label}</div>
-              <div style={styles.cardValue}>{stats[key]}</div>
-            </div>
-            <div style={{ ...styles.iconBox, backgroundColor: bg, color }}>
-              <Icon />
-            </div>
-          </Link>
-        ))}
-      </div>
+      {loading ? (
+        <Spinner text="Loading stats..." />
+      ) : (
+        <>
+          <div style={styles.grid}>
+            {statCards.map(({ to, label, key, Icon, color, bg }) => (
+              <Link key={key} to={to} style={styles.card}>
+                <div style={styles.cardLeft}>
+                  <div style={styles.cardLabel}>{label}</div>
+                  <div style={styles.cardValue}>{stats[key]}</div>
+                </div>
+                <div style={{ ...styles.iconBox, backgroundColor: bg, color }}>
+                  <Icon />
+                </div>
+              </Link>
+            ))}
+          </div>
 
-      <div style={styles.quickLinks}>
-        <h2 style={styles.sectionTitle}>Quick Links</h2>
-        <div style={styles.linkGrid}>
-          <Link to="/candidates" style={styles.linkCard}>Manage Candidates</Link>
-          <Link to="/companies"  style={styles.linkCard}>Manage Companies</Link>
-          <Link to="/jobs"       style={styles.linkCard}>Manage Jobs</Link>
-          <Link to="/users"      style={styles.linkCard}>Manage Users</Link>
-          <Link to="/deleted"    style={styles.linkCard}>View Soft-Deleted Records</Link>
-        </div>
-      </div>
+          <div style={styles.quickLinks}>
+            <h2 style={styles.sectionTitle}>Quick Links</h2>
+            <div style={styles.linkGrid}>
+              <Link to="/candidates" style={styles.linkCard}>Manage Candidates</Link>
+              <Link to="/companies"  style={styles.linkCard}>Manage Companies</Link>
+              <Link to="/jobs"       style={styles.linkCard}>Manage Jobs</Link>
+              <Link to="/users"      style={styles.linkCard}>Manage Users</Link>
+              <Link to="/deleted"    style={styles.linkCard}>View Soft-Deleted Records</Link>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

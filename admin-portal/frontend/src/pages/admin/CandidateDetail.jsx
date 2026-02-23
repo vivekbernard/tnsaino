@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
+import Spinner from '../../components/Spinner';
 
 const styles = {
   title: { fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' },
@@ -60,8 +61,9 @@ export default function CandidateDetail() {
       }
     } catch (err) {
       console.error('Failed to fetch candidate', err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const fetchPhoto = async (userId) => {
@@ -85,7 +87,7 @@ export default function CandidateDetail() {
     return <div style={styles.value}>{val}</div>;
   };
 
-  if (loading) return <div style={{ padding: '2rem', textAlign: 'center', color: '#6b7280' }}>Loading...</div>;
+  if (loading) return <Spinner text="Loading candidate..." />;
   if (!candidate) return <div style={{ padding: '2rem', textAlign: 'center', color: '#991b1b' }}>Candidate not found.</div>;
 
   return (
