@@ -2,6 +2,7 @@ package com.portal.handler;
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.portal.dto.Job;
 import com.portal.service.JobService;
 import com.portal.util.ApiGatewayRequestParser;
@@ -16,9 +17,10 @@ public class JobCrudApiHandler {
 
     private static final String ROUTE_GET_JOB = "GET /api/job";
     private static final String ROUTE_GET_JOB_LIST = "GET /api/joblist";
+    private static final String ROUTE_PUT_JOB = "PUT /api/job";
     private static final String ROUTE_DELETE_JOB = "DELETE /api/job";
 
-    private static final Set<String> HANDLED_ROUTES = Set.of(ROUTE_GET_JOB, ROUTE_GET_JOB_LIST, ROUTE_DELETE_JOB);
+    private static final Set<String> HANDLED_ROUTES = Set.of(ROUTE_GET_JOB, ROUTE_GET_JOB_LIST, ROUTE_PUT_JOB, ROUTE_DELETE_JOB);
 
     private final JobService jobService;
     private final ApiResponseFactory responseFactory;
@@ -41,6 +43,7 @@ public class JobCrudApiHandler {
         return switch (routeKey(method, path)) {
             case ROUTE_GET_JOB -> handleGet(event);
             case ROUTE_GET_JOB_LIST -> handleList(event);
+            case ROUTE_PUT_JOB -> handlePut(event);
             case ROUTE_DELETE_JOB -> handleDelete(event);
             default -> responseFactory.notFound("Route not found");
         };
@@ -69,6 +72,20 @@ public class JobCrudApiHandler {
             return responseFactory.ok(jobService.listAllIncludingDeleted(page, size));
         }
         return responseFactory.ok(jobService.listJobs(page, size, companyId, status));
+    }
+
+    private APIGatewayV2HTTPResponse handlePut(APIGatewayV2HTTPEvent event) {
+        String body = requestParser.readBody(event);
+        if (body == null || body.isBlank()) return responseFactory.badRequest("Body is required");
+        try {
+            Job job = ApiResponseFactory.objectMapper().readValue(body, Job.class);
+            jobService.updateJob(job);
+            return responseFactory.ok(Map.of("message", "Job updated", "job", job));
+        } catch (JsonProcessingException e) {
+            return responseFactory.badRequest("Invalid JSON body");
+        } catch (IllegalArgumentException e) {
+            return responseFactory.badRequest(e.getMessage());
+        }
     }
 
     private APIGatewayV2HTTPResponse handleDelete(APIGatewayV2HTTPEvent event) {

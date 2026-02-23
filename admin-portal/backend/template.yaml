@@ -62,6 +62,11 @@ Resources:
                   - dsql:CommitTransaction
                   - dsql:RollbackTransaction
                 Resource: "*"
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:HeadObject
+                Resource: arn:aws:s3:::tnsaino-canidate-artifacts/candidates/*
 
   AdminHttpApi:
     Type: AWS::Serverless::HttpApi
@@ -112,6 +117,7 @@ Resources:
           DSQL_ENDPOINT: !Ref DsqlEndpoint
           DSQL_DATABASE: !Ref DsqlDatabase
           DSQL_DB_USER: !Ref DsqlDbUser
+          S3_PHOTO_BUCKET: tnsaino-canidate-artifacts
       Events:
         # User admin routes
         PutUser:
@@ -170,8 +176,20 @@ Resources:
             ApiId: !Ref AdminHttpApi
             Path: /api/candidate/enable
             Method: PUT
+        GetCandidatePhotoDownloadUrl:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/candidate/photo/download-url
+            Method: GET
 
         # Company admin routes
+        PutCompany:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/company
+            Method: PUT
         GetCompany:
           Type: HttpApi
           Properties:
@@ -204,6 +222,12 @@ Resources:
             Method: PUT
 
         # Job admin routes
+        PutJob:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/job
+            Method: PUT
         GetJob:
           Type: HttpApi
           Properties:

@@ -14,6 +14,9 @@ const styles = {
   profileEmail: { color: '#6b7280', marginBottom: '1rem' },
   profileDetail: { fontSize: '0.9rem', color: '#475569', marginBottom: '0.25rem' },
   editLink: { display: 'inline-block', marginTop: '1rem', padding: '0.5rem 1.25rem', backgroundColor: '#2563eb', color: '#fff', borderRadius: '6px', textDecoration: 'none', fontSize: '0.9rem' },
+  promptCard: { padding: '2rem', backgroundColor: '#fffbeb', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', textAlign: 'center' },
+  promptText: { fontSize: '1rem', color: '#92400e', marginBottom: '1rem' },
+  createLink: { display: 'inline-block', padding: '0.6rem 1.5rem', backgroundColor: '#2563eb', color: '#fff', borderRadius: '6px', textDecoration: 'none', fontSize: '0.9rem' },
 };
 
 export default function CandidateDashboard() {
@@ -50,26 +53,37 @@ export default function CandidateDashboard() {
     <div>
       <h1 style={styles.title}>Candidate Dashboard</h1>
 
-      <div style={styles.grid}>
-        <div style={styles.card}>
-          <div style={styles.cardTitle}>My Applications</div>
-          <div style={styles.cardValue}>{appCount}</div>
+      {!user?.linkedEntityId && (
+        <div style={styles.promptCard}>
+          <div style={styles.promptText}>You haven't created your candidate profile yet. Set up your profile to start applying for jobs.</div>
+          <Link to="/candidate/profile" style={styles.createLink}>Create Your Profile</Link>
         </div>
-        <div style={styles.card}>
-          <div style={styles.cardTitle}>Profile Status</div>
-          <div style={styles.cardValue}>{profile?.status || 'N/A'}</div>
-        </div>
-      </div>
+      )}
 
-      {profile && (
-        <div style={styles.profileCard}>
-          <div style={styles.profileName}>{profile.name}</div>
-          <div style={styles.profileEmail}>{profile.email}</div>
-          {profile.currentTitle && <div style={styles.profileDetail}>Title: {profile.currentTitle}</div>}
-          {profile.currentCompany && <div style={styles.profileDetail}>Company: {profile.currentCompany}</div>}
-          {profile.phone && <div style={styles.profileDetail}>Phone: {profile.phone}</div>}
-          <Link to="/candidate/profile" style={styles.editLink}>Edit Profile</Link>
-        </div>
+      {user?.linkedEntityId && (
+        <>
+          <div style={styles.grid}>
+            <div style={styles.card}>
+              <div style={styles.cardTitle}>My Applications</div>
+              <div style={styles.cardValue}>{appCount}</div>
+            </div>
+            <div style={styles.card}>
+              <div style={styles.cardTitle}>Profile Status</div>
+              <div style={styles.cardValue}>{profile?.status || 'N/A'}</div>
+            </div>
+          </div>
+
+          {profile && (
+            <div style={styles.profileCard}>
+              <div style={styles.profileName}>{profile.name}</div>
+              <div style={styles.profileEmail}>{profile.email}</div>
+              {profile.currentTitle && <div style={styles.profileDetail}>Title: {profile.currentTitle}</div>}
+              {profile.currentCompany && <div style={styles.profileDetail}>Company: {profile.currentCompany}</div>}
+              {profile.phone && <div style={styles.profileDetail}>Phone: {profile.phone}</div>}
+              <Link to="/candidate/profile" style={styles.editLink}>Edit Profile</Link>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

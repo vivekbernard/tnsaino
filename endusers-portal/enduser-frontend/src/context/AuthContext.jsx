@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { getCurrentUser, signOut, signIn, signUp, fetchAuthSession } from 'aws-amplify/auth';
+import axiosClient from '../api/axiosClient';
 
 const AuthContext = createContext(null);
 
@@ -15,11 +16,23 @@ export function AuthProvider({ children }) {
       const role = payload?.['custom:role'] || null;
       const email = payload?.email || null;
       const sub = payload?.sub || null;
+
+      let linkedEntityId = null;
+      if (role === 'CANDIDATE' && sub) {
+        try {
+          const res = await axiosClient.get(`/api/candidate?userId=${sub}`);
+          linkedEntityId = res.data?.id || null;
+        } catch {
+          // No candidate profile yet — that's fine
+        }
+      }
+
       setUser({
         username: currentUser.username,
         email,
         sub,
         role,
+        linkedEntityId,
       });
     } catch {
       setUser(null);
@@ -39,6 +52,10 @@ export function AuthProvider({ children }) {
     }
     await checkAuth();
     return user;
+  };
+
+  const refreshLinkedEntity = async () => {
+    await checkAuth();
   };
 
   const register = async ({ username, password, email, role, name }) => {
@@ -66,6 +83,7 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
+    refreshLinkedEntity,
     isAuthenticated: !!user,
     role: user?.role || null,
   };

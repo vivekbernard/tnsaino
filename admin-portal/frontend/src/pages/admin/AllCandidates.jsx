@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
 import Pagination from '../../components/Pagination';
 
@@ -11,11 +12,13 @@ const styles = {
   active: { backgroundColor: '#dcfce7', color: '#166534' },
   disabled: { backgroundColor: '#fee2e2', color: '#991b1b' },
   actionBtn: { padding: '0.3rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: '#fff', cursor: 'pointer', fontSize: '0.8rem', marginRight: '0.5rem' },
+  viewBtn: { padding: '0.3rem 0.75rem', border: '1px solid #93c5fd', borderRadius: '4px', backgroundColor: '#eff6ff', cursor: 'pointer', fontSize: '0.8rem', color: '#1d4ed8', marginRight: '0.5rem' },
   dangerBtn: { padding: '0.3rem 0.75rem', border: '1px solid #fca5a5', borderRadius: '4px', backgroundColor: '#fef2f2', cursor: 'pointer', fontSize: '0.8rem', color: '#991b1b' },
   empty: { textAlign: 'center', padding: '3rem', color: '#6b7280' },
 };
 
 export default function AllCandidates() {
+  const navigate = useNavigate();
   const [candidates, setCandidates] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -88,6 +91,7 @@ export default function AllCandidates() {
                   </span>
                 </td>
                 <td style={styles.td}>
+                  <button style={styles.viewBtn} onClick={() => navigate(`/candidates/${c.id}`)}>View</button>
                   {c.status === 'ACTIVE' ? (
                     <button style={styles.actionBtn} onClick={() => handleDisable(c.id)}>Disable</button>
                   ) : (

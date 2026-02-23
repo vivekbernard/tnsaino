@@ -138,6 +138,28 @@ public class JobService {
         return findById(job.id());
     }
 
+    public void updateJob(Job job) {
+        validateUuid(job.id(), "id");
+        validateRequired(job.title(), "title");
+        String sql = """
+                UPDATE %s SET
+                    title = :title, job_description = :jobDescription,
+                    required_professional_experience = :reqProfExp,
+                    required_educational_experience = :reqEduExp,
+                    status = COALESCE(:status, status),
+                    updated_at = now()
+                WHERE id = CAST(:id AS uuid) AND is_deleted = FALSE
+                """.formatted(table);
+        jdbcClient.sql(sql)
+                .param("id", job.id())
+                .param("title", job.title())
+                .param("jobDescription", blankToNull(job.jobDescription()))
+                .param("reqProfExp", blankToNull(job.requiredProfessionalExperience()))
+                .param("reqEduExp", blankToNull(job.requiredEducationalExperience()))
+                .param("status", blankToNull(job.status()))
+                .update();
+    }
+
     public Job softDelete(String id) {
         validateUuid(id, "id");
         Job existing = findById(id);

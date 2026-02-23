@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axiosClient from '../../api/axiosClient';
 import Pagination from '../../components/Pagination';
 
@@ -10,11 +11,13 @@ const styles = {
   badge: { padding: '0.2rem 0.6rem', borderRadius: '999px', fontSize: '0.75rem', fontWeight: '500' },
   open: { backgroundColor: '#dcfce7', color: '#166534' },
   closed: { backgroundColor: '#fee2e2', color: '#991b1b' },
+  viewBtn: { padding: '0.3rem 0.75rem', border: '1px solid #93c5fd', borderRadius: '4px', backgroundColor: '#eff6ff', cursor: 'pointer', fontSize: '0.8rem', color: '#1d4ed8', marginRight: '0.5rem' },
   dangerBtn: { padding: '0.3rem 0.75rem', border: '1px solid #fca5a5', borderRadius: '4px', backgroundColor: '#fef2f2', cursor: 'pointer', fontSize: '0.8rem', color: '#991b1b' },
   empty: { textAlign: 'center', padding: '3rem', color: '#6b7280' },
 };
 
 export default function AllJobs() {
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -71,6 +74,7 @@ export default function AllJobs() {
                 <td style={styles.td}>{job.applicantCount || 0}</td>
                 <td style={styles.td}>{job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'N/A'}</td>
                 <td style={styles.td}>
+                  <button style={styles.viewBtn} onClick={() => navigate(`/jobs/${job.id}`)}>View</button>
                   <button style={styles.dangerBtn} onClick={() => handleDelete(job.id)}>Delete</button>
                 </td>
               </tr>

@@ -62,6 +62,12 @@ Resources:
                   - dsql:CommitTransaction
                   - dsql:RollbackTransaction
                 Resource: "*"
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:HeadObject
+                Resource: arn:aws:s3:::tnsaino-canidate-artifacts/candidates/*
 
   EnduserHttpApi:
     Type: AWS::Serverless::HttpApi
@@ -112,6 +118,7 @@ Resources:
           DSQL_ENDPOINT: !Ref DsqlEndpoint
           DSQL_DATABASE: !Ref DsqlDatabase
           DSQL_DB_USER: !Ref DsqlDbUser
+          S3_PHOTO_BUCKET: tnsaino-canidate-artifacts
       Events:
         # User self-service routes
         PutUser:
@@ -139,6 +146,20 @@ Resources:
           Properties:
             ApiId: !Ref EnduserHttpApi
             Path: /api/candidate
+            Method: GET
+
+        # Candidate photo routes
+        GetPhotoUploadUrl:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/candidate/photo/upload-url
+            Method: GET
+        GetPhotoDownloadUrl:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/candidate/photo/download-url
             Method: GET
 
         # Company routes

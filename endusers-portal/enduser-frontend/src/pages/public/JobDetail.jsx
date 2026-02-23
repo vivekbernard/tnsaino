@@ -92,7 +92,7 @@ export default function JobDetail() {
           </div>
         )}
 
-        {isAuthenticated && role === 'CANDIDATE' && job.status === 'OPEN' && (
+        {isAuthenticated && role === 'CANDIDATE' && job.status === 'OPEN' && user?.linkedEntityId && (
           <button
             style={applying ? styles.disabledBtn : styles.applyBtn}
             onClick={handleApply}
@@ -100,6 +100,12 @@ export default function JobDetail() {
           >
             {applying ? 'Applying...' : 'Apply Now'}
           </button>
+        )}
+
+        {isAuthenticated && role === 'CANDIDATE' && job.status === 'OPEN' && !user?.linkedEntityId && (
+          <p style={{ marginTop: '1rem', color: '#92400e', backgroundColor: '#fffbeb', padding: '0.75rem', borderRadius: '6px' }}>
+            Please <a href="/candidate/profile">complete your profile</a> before applying for jobs.
+          </p>
         )}
 
         {!isAuthenticated && job.status === 'OPEN' && (

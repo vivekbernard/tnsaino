@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
 import com.portal.dto.Candidate;
 import com.portal.service.CandidateService;
+import com.portal.service.PhotoPresignService;
 import com.portal.util.ApiGatewayRequestParser;
 import com.portal.util.ApiResponseFactory;
 import org.springframework.stereotype.Component;
@@ -19,17 +20,22 @@ public class CandidateCrudApiHandler {
     private static final String ROUTE_DELETE_CANDIDATE = "DELETE /api/candidate";
     private static final String ROUTE_PUT_DISABLE = "PUT /api/candidate/disable";
     private static final String ROUTE_PUT_ENABLE = "PUT /api/candidate/enable";
+    private static final String ROUTE_GET_PHOTO_DOWNLOAD = "GET /api/candidate/photo/download-url";
 
     private static final Set<String> HANDLED_ROUTES = Set.of(
             ROUTE_GET_CANDIDATE, ROUTE_GET_CANDIDATE_LIST,
-            ROUTE_DELETE_CANDIDATE, ROUTE_PUT_DISABLE, ROUTE_PUT_ENABLE);
+            ROUTE_DELETE_CANDIDATE, ROUTE_PUT_DISABLE, ROUTE_PUT_ENABLE,
+            ROUTE_GET_PHOTO_DOWNLOAD);
 
     private final CandidateService candidateService;
+    private final PhotoPresignService photoPresignService;
     private final ApiResponseFactory responseFactory;
     private final ApiGatewayRequestParser requestParser;
 
-    public CandidateCrudApiHandler(CandidateService candidateService, ApiResponseFactory responseFactory, ApiGatewayRequestParser requestParser) {
+    public CandidateCrudApiHandler(CandidateService candidateService, PhotoPresignService photoPresignService,
+                                   ApiResponseFactory responseFactory, ApiGatewayRequestParser requestParser) {
         this.candidateService = candidateService;
+        this.photoPresignService = photoPresignService;
         this.responseFactory = responseFactory;
         this.requestParser = requestParser;
     }
@@ -48,6 +54,7 @@ public class CandidateCrudApiHandler {
             case ROUTE_DELETE_CANDIDATE -> handleDelete(event);
             case ROUTE_PUT_DISABLE -> handleDisable(event);
             case ROUTE_PUT_ENABLE -> handleEnable(event);
+            case ROUTE_GET_PHOTO_DOWNLOAD -> handlePhotoDownloadUrl(event);
             default -> responseFactory.notFound("Route not found");
         };
     }
@@ -107,6 +114,20 @@ public class CandidateCrudApiHandler {
             return responseFactory.ok(Map.of("message", "Candidate enabled", "id", id));
         } catch (IllegalArgumentException e) {
             return responseFactory.badRequest(e.getMessage());
+        }
+    }
+
+    private APIGatewayV2HTTPResponse handlePhotoDownloadUrl(APIGatewayV2HTTPEvent event) {
+        String userId = requestParser.readQueryParam(event, "userId");
+        if (userId == null || userId.isBlank())
+            return responseFactory.badRequest("Query parameter 'userId' is required");
+        try {
+            if (!photoPresignService.photoExists(userId))
+                return responseFactory.notFound("No photo uploaded");
+            String downloadUrl = photoPresignService.generateDownloadUrl(userId);
+            return responseFactory.ok(Map.of("downloadUrl", downloadUrl));
+        } catch (Exception e) {
+            return responseFactory.serverError("Failed to generate download URL: " + e.getMessage());
         }
     }
 

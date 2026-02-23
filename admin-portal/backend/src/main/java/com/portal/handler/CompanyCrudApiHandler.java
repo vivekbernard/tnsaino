@@ -2,6 +2,7 @@ package com.portal.handler;
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.portal.dto.Company;
 import com.portal.service.CompanyService;
 import com.portal.util.ApiGatewayRequestParser;
@@ -17,12 +18,13 @@ public class CompanyCrudApiHandler {
     private static final String ROUTE_GET_COMPANY = "GET /api/company";
     private static final String ROUTE_GET_COMPANY_LIST = "GET /api/companylist";
     private static final String ROUTE_DELETE_COMPANY = "DELETE /api/company";
+    private static final String ROUTE_PUT_COMPANY = "PUT /api/company";
     private static final String ROUTE_PUT_DISABLE = "PUT /api/company/disable";
     private static final String ROUTE_PUT_ENABLE = "PUT /api/company/enable";
 
     private static final Set<String> HANDLED_ROUTES = Set.of(
             ROUTE_GET_COMPANY, ROUTE_GET_COMPANY_LIST,
-            ROUTE_DELETE_COMPANY, ROUTE_PUT_DISABLE, ROUTE_PUT_ENABLE);
+            ROUTE_DELETE_COMPANY, ROUTE_PUT_COMPANY, ROUTE_PUT_DISABLE, ROUTE_PUT_ENABLE);
 
     private final CompanyService companyService;
     private final ApiResponseFactory responseFactory;
@@ -46,6 +48,7 @@ public class CompanyCrudApiHandler {
             case ROUTE_GET_COMPANY -> handleGet(event);
             case ROUTE_GET_COMPANY_LIST -> handleList(event);
             case ROUTE_DELETE_COMPANY -> handleDelete(event);
+            case ROUTE_PUT_COMPANY -> handlePut(event);
             case ROUTE_PUT_DISABLE -> handleDisable(event);
             case ROUTE_PUT_ENABLE -> handleEnable(event);
             default -> responseFactory.notFound("Route not found");
@@ -72,6 +75,20 @@ public class CompanyCrudApiHandler {
             return responseFactory.ok(companyService.listAllIncludingDeleted(page, size));
         }
         return responseFactory.ok(companyService.listCompanies(page, size));
+    }
+
+    private APIGatewayV2HTTPResponse handlePut(APIGatewayV2HTTPEvent event) {
+        String body = requestParser.readBody(event);
+        if (body == null || body.isBlank()) return responseFactory.badRequest("Body is required");
+        try {
+            Company company = ApiResponseFactory.objectMapper().readValue(body, Company.class);
+            companyService.upsert(company);
+            return responseFactory.ok(Map.of("message", "Company updated", "company", company));
+        } catch (JsonProcessingException e) {
+            return responseFactory.badRequest("Invalid JSON body");
+        } catch (IllegalArgumentException e) {
+            return responseFactory.badRequest(e.getMessage());
+        }
     }
 
     private APIGatewayV2HTTPResponse handleDelete(APIGatewayV2HTTPEvent event) {

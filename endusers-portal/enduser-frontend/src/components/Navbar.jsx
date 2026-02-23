@@ -36,6 +36,7 @@ export default function Navbar() {
           <>
             <Link to="/candidate/dashboard" style={styles.link}>Dashboard</Link>
             <Link to="/candidate/applications" style={styles.link}>My Applications</Link>
+            <Link to="/candidate/profile" style={styles.link}>My Profile</Link>
           </>
         )}
 
