@@ -19,6 +19,10 @@ import java.util.Set;
 public class CompanyCrudApiHandler {
 
     private static final Logger log = LoggerFactory.getLogger(CompanyCrudApiHandler.class);
+    private static final String ROLE_COMPANY = "COMPANY";
+    private static final String MSG_COMPANY_REQUIRED = "Company access required";
+    private static final String MSG_UNABLE_TO_IDENTIFY = "Unable to identify caller";
+
     private static final String ROUTE_PUT_COMPANY = "PUT /api/company";
     private static final String ROUTE_GET_COMPANY = "GET /api/company";
     private static final String ROUTE_GET_LOGO_UPLOAD = "GET /api/company/logo/upload-url";
@@ -52,19 +56,19 @@ public class CompanyCrudApiHandler {
 
         return switch (routeKey(method, path)) {
             case ROUTE_PUT_COMPANY -> {
-                if (!"COMPANY".equals(role))
-                    yield responseFactory.forbidden("Company access required");
+                if (!ROLE_COMPANY.equals(role))
+                    yield responseFactory.forbidden(MSG_COMPANY_REQUIRED);
                 yield handlePut(event);
             }
             case ROUTE_GET_COMPANY -> handleGet(event);
             case ROUTE_GET_LOGO_UPLOAD -> {
-                if (!"COMPANY".equals(role))
-                    yield responseFactory.forbidden("Company access required");
+                if (!ROLE_COMPANY.equals(role))
+                    yield responseFactory.forbidden(MSG_COMPANY_REQUIRED);
                 yield handleLogoUploadUrl(event);
             }
             case ROUTE_GET_LOGO_DOWNLOAD -> {
-                if (!"COMPANY".equals(role))
-                    yield responseFactory.forbidden("Company access required");
+                if (!ROLE_COMPANY.equals(role))
+                    yield responseFactory.forbidden(MSG_COMPANY_REQUIRED);
                 yield handleLogoDownloadUrl(event);
             }
             default -> responseFactory.notFound("Route not found");
@@ -76,6 +80,11 @@ public class CompanyCrudApiHandler {
         if (body == null || body.isBlank()) return responseFactory.badRequest("Body is required");
         try {
             Company company = ApiResponseFactory.objectMapper().readValue(body, Company.class);
+            String callerSub = requestParser.readUserId(event);
+            if (callerSub == null || callerSub.isBlank())
+                return responseFactory.forbidden(MSG_UNABLE_TO_IDENTIFY);
+            if (company.userId() == null || !callerSub.equals(company.userId()))
+                return responseFactory.forbidden("You can only create or update your own company profile");
             companyService.upsert(company);
             return responseFactory.ok(Map.of("message", "Company upserted", "company", company));
         } catch (JsonProcessingException e) {
@@ -91,9 +100,16 @@ public class CompanyCrudApiHandler {
         if ((id == null || id.isBlank()) && (userId == null || userId.isBlank()))
             return responseFactory.badRequest("Query parameter 'id' or 'userId' is required");
         try {
-            Company company = (id != null && !id.isBlank())
-                    ? companyService.findById(id)
-                    : companyService.findByUserId(userId);
+            Company company;
+            if (id != null && !id.isBlank()) {
+                company = companyService.findById(id);
+            } else {
+                // userId lookup: caller may only look up their own company profile this way
+                String callerSub = requestParser.readUserId(event);
+                if (callerSub == null || !callerSub.equals(userId))
+                    return responseFactory.forbidden("You can only access your own company profile this way");
+                company = companyService.findByUserId(userId);
+            }
             if (company == null) return responseFactory.notFound("Company not found");
             return responseFactory.ok(company);
         } catch (IllegalArgumentException e) {
@@ -104,7 +120,7 @@ public class CompanyCrudApiHandler {
     private APIGatewayV2HTTPResponse handleLogoUploadUrl(APIGatewayV2HTTPEvent event) {
         String callerSub = requestParser.readUserId(event);
         if (callerSub == null || callerSub.isBlank())
-            return responseFactory.forbidden("Unable to identify caller");
+            return responseFactory.forbidden(MSG_UNABLE_TO_IDENTIFY);
         String contentType = requestParser.readQueryParam(event, "contentType");
         if (contentType == null || contentType.isBlank()) contentType = "image/jpeg";
         try {
@@ -119,7 +135,7 @@ public class CompanyCrudApiHandler {
     private APIGatewayV2HTTPResponse handleLogoDownloadUrl(APIGatewayV2HTTPEvent event) {
         String callerSub = requestParser.readUserId(event);
         if (callerSub == null || callerSub.isBlank())
-            return responseFactory.forbidden("Unable to identify caller");
+            return responseFactory.forbidden(MSG_UNABLE_TO_IDENTIFY);
         try {
             if (!photoPresignService.logoExists(callerSub))
                 return responseFactory.notFound("No logo uploaded");

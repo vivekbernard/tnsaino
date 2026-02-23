@@ -19,6 +19,11 @@ import java.util.Set;
 public class CandidateCrudApiHandler {
 
     private static final Logger log = LoggerFactory.getLogger(CandidateCrudApiHandler.class);
+    private static final String ROLE_CANDIDATE = "CANDIDATE";
+    private static final String MSG_CANDIDATE_REQUIRED = "Candidate access required";
+    private static final String MSG_UNABLE_TO_IDENTIFY = "Unable to identify caller";
+    private static final String MSG_OWN_PROFILE_ONLY = "You can only access your own profile";
+
     private static final String ROUTE_PUT_CANDIDATE = "PUT /api/candidate";
     private static final String ROUTE_GET_CANDIDATE = "GET /api/candidate";
     private static final String ROUTE_GET_PHOTO_UPLOAD = "GET /api/candidate/photo/upload-url";
@@ -52,19 +57,19 @@ public class CandidateCrudApiHandler {
 
         return switch (routeKey(method, path)) {
             case ROUTE_PUT_CANDIDATE -> {
-                if (!"CANDIDATE".equals(role))
-                    yield responseFactory.forbidden("Candidate access required");
+                if (!ROLE_CANDIDATE.equals(role))
+                    yield responseFactory.forbidden(MSG_CANDIDATE_REQUIRED);
                 yield handlePut(event);
             }
             case ROUTE_GET_CANDIDATE -> handleGet(event);
             case ROUTE_GET_PHOTO_UPLOAD -> {
-                if (!"CANDIDATE".equals(role))
-                    yield responseFactory.forbidden("Candidate access required");
+                if (!ROLE_CANDIDATE.equals(role))
+                    yield responseFactory.forbidden(MSG_CANDIDATE_REQUIRED);
                 yield handlePhotoUploadUrl(event);
             }
             case ROUTE_GET_PHOTO_DOWNLOAD -> {
-                if (!"CANDIDATE".equals(role))
-                    yield responseFactory.forbidden("Candidate access required");
+                if (!ROLE_CANDIDATE.equals(role))
+                    yield responseFactory.forbidden(MSG_CANDIDATE_REQUIRED);
                 yield handlePhotoDownloadUrl(event);
             }
             default -> responseFactory.notFound("Route not found");
@@ -78,7 +83,7 @@ public class CandidateCrudApiHandler {
             Candidate candidate = ApiResponseFactory.objectMapper().readValue(body, Candidate.class);
             String callerSub = requestParser.readUserId(event);
             if (callerSub == null || callerSub.isBlank())
-                return responseFactory.forbidden("Unable to identify caller");
+                return responseFactory.forbidden(MSG_UNABLE_TO_IDENTIFY);
             if (candidate.userId() == null || !callerSub.equals(candidate.userId()))
                 return responseFactory.forbidden("You can only create or update your own candidate profile");
             candidateService.upsert(candidate);
@@ -95,12 +100,18 @@ public class CandidateCrudApiHandler {
         String userId = requestParser.readQueryParam(event, "userId");
         if ((id == null || id.isBlank()) && (userId == null || userId.isBlank()))
             return responseFactory.badRequest("Query parameter 'id' or 'userId' is required");
+        String role = requestParser.readUserRole(event);
+        String callerSub = requestParser.readUserId(event);
         try {
             Candidate candidate;
             if (userId != null && !userId.isBlank()) {
+                if (!isCandidateAccessAllowed(role, callerSub, userId))
+                    return responseFactory.forbidden(MSG_OWN_PROFILE_ONLY);
                 candidate = candidateService.findByUserId(userId);
             } else {
                 candidate = candidateService.findById(id);
+                if (candidate != null && !isCandidateAccessAllowed(role, callerSub, candidate.userId()))
+                    return responseFactory.forbidden(MSG_OWN_PROFILE_ONLY);
             }
             if (candidate == null) return responseFactory.notFound("Candidate not found");
             return responseFactory.ok(candidate);
@@ -109,10 +120,18 @@ public class CandidateCrudApiHandler {
         }
     }
 
+    /**
+     * Returns true if the caller is allowed to read the candidate profile owned by ownerSub.
+     * CANDIDATE role is restricted to their own profile; all other roles (e.g. COMPANY) are unrestricted.
+     */
+    private static boolean isCandidateAccessAllowed(String role, String callerSub, String ownerSub) {
+        return !ROLE_CANDIDATE.equals(role) || (callerSub != null && callerSub.equals(ownerSub));
+    }
+
     private APIGatewayV2HTTPResponse handlePhotoUploadUrl(APIGatewayV2HTTPEvent event) {
         String callerSub = requestParser.readUserId(event);
         if (callerSub == null || callerSub.isBlank())
-            return responseFactory.forbidden("Unable to identify caller");
+            return responseFactory.forbidden(MSG_UNABLE_TO_IDENTIFY);
         String contentType = requestParser.readQueryParam(event, "contentType");
         if (contentType == null || contentType.isBlank()) contentType = "image/jpeg";
         try {
@@ -127,7 +146,7 @@ public class CandidateCrudApiHandler {
     private APIGatewayV2HTTPResponse handlePhotoDownloadUrl(APIGatewayV2HTTPEvent event) {
         String callerSub = requestParser.readUserId(event);
         if (callerSub == null || callerSub.isBlank())
-            return responseFactory.forbidden("Unable to identify caller");
+            return responseFactory.forbidden(MSG_UNABLE_TO_IDENTIFY);
         try {
             if (!photoPresignService.photoExists(callerSub))
                 return responseFactory.notFound("No photo uploaded");

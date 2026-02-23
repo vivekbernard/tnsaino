@@ -3,8 +3,14 @@ package com.portal.handler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.portal.dto.Candidate;
+import com.portal.dto.Company;
+import com.portal.dto.Job;
 import com.portal.dto.JobApplication;
+import com.portal.service.CandidateService;
+import com.portal.service.CompanyService;
 import com.portal.service.JobApplicationService;
+import com.portal.service.JobService;
 import com.portal.util.ApiGatewayRequestParser;
 import com.portal.util.ApiResponseFactory;
 import org.springframework.stereotype.Component;
@@ -15,6 +21,10 @@ import java.util.Set;
 @Component
 public class JobApplicationCrudApiHandler {
 
+    private static final String ROLE_CANDIDATE = "CANDIDATE";
+    private static final String ROLE_COMPANY = "COMPANY";
+    private static final String MSG_ACCESS_DENIED = "Access denied";
+
     private static final String ROUTE_PUT_APPLICATION = "PUT /api/jobapplication";
     private static final String ROUTE_GET_APPLICATION = "GET /api/jobapplication";
     private static final String ROUTE_GET_APPLICATION_LIST = "GET /api/jobapplicationlist";
@@ -24,11 +34,22 @@ public class JobApplicationCrudApiHandler {
             ROUTE_PUT_APPLICATION, ROUTE_GET_APPLICATION, ROUTE_GET_APPLICATION_LIST, ROUTE_PUT_STATUS);
 
     private final JobApplicationService applicationService;
+    private final CandidateService candidateService;
+    private final CompanyService companyService;
+    private final JobService jobService;
     private final ApiResponseFactory responseFactory;
     private final ApiGatewayRequestParser requestParser;
 
-    public JobApplicationCrudApiHandler(JobApplicationService applicationService, ApiResponseFactory responseFactory, ApiGatewayRequestParser requestParser) {
+    public JobApplicationCrudApiHandler(JobApplicationService applicationService,
+                                        CandidateService candidateService,
+                                        CompanyService companyService,
+                                        JobService jobService,
+                                        ApiResponseFactory responseFactory,
+                                        ApiGatewayRequestParser requestParser) {
         this.applicationService = applicationService;
+        this.candidateService = candidateService;
+        this.companyService = companyService;
+        this.jobService = jobService;
         this.responseFactory = responseFactory;
         this.requestParser = requestParser;
     }
@@ -44,14 +65,14 @@ public class JobApplicationCrudApiHandler {
 
         return switch (routeKey(method, path)) {
             case ROUTE_PUT_APPLICATION -> {
-                if (!"CANDIDATE".equals(role))
+                if (!ROLE_CANDIDATE.equals(role))
                     yield responseFactory.forbidden("Candidate access required");
                 yield handleApply(event);
             }
-            case ROUTE_GET_APPLICATION -> handleGet(event);
-            case ROUTE_GET_APPLICATION_LIST -> handleList(event);
+            case ROUTE_GET_APPLICATION -> handleGet(event, role);
+            case ROUTE_GET_APPLICATION_LIST -> handleList(event, role);
             case ROUTE_PUT_STATUS -> {
-                if (!"COMPANY".equals(role))
+                if (!ROLE_COMPANY.equals(role))
                     yield responseFactory.forbidden("Company access required");
                 yield handleUpdateStatus(event);
             }
@@ -73,31 +94,73 @@ public class JobApplicationCrudApiHandler {
         }
     }
 
-    private APIGatewayV2HTTPResponse handleGet(APIGatewayV2HTTPEvent event) {
+    private APIGatewayV2HTTPResponse handleGet(APIGatewayV2HTTPEvent event, String role) {
         String id = requestParser.readQueryParam(event, "id");
         if (id == null || id.isBlank()) return responseFactory.badRequest("Query parameter 'id' is required");
+        String callerSub = requestParser.readUserId(event);
+        if (callerSub == null || callerSub.isBlank())
+            return responseFactory.forbidden("Unable to identify caller");
         try {
             JobApplication app = applicationService.findById(id);
             if (app == null) return responseFactory.notFound("Application not found");
+            if (ROLE_CANDIDATE.equals(role)) {
+                Candidate candidate = candidateService.findByUserId(callerSub);
+                if (candidate == null || !candidate.id().equals(app.candidateId()))
+                    return responseFactory.forbidden(MSG_ACCESS_DENIED);
+            } else if (ROLE_COMPANY.equals(role)) {
+                Job job = jobService.findById(app.jobId());
+                Company company = companyService.findByUserId(callerSub);
+                if (job == null || company == null || !company.id().equals(job.companyId()))
+                    return responseFactory.forbidden(MSG_ACCESS_DENIED);
+            } else {
+                return responseFactory.forbidden(MSG_ACCESS_DENIED);
+            }
             return responseFactory.ok(app);
         } catch (IllegalArgumentException e) {
             return responseFactory.badRequest(e.getMessage());
         }
     }
 
-    private APIGatewayV2HTTPResponse handleList(APIGatewayV2HTTPEvent event) {
+    private APIGatewayV2HTTPResponse handleList(APIGatewayV2HTTPEvent event, String role) {
         int page = requestParser.readIntQueryParam(event, "page", 0);
         int size = requestParser.readIntQueryParam(event, "size", 20);
         String jobId = requestParser.readQueryParam(event, "jobId");
         String candidateId = requestParser.readQueryParam(event, "candidateId");
-
-        if (jobId != null && !jobId.isBlank()) {
-            return responseFactory.ok(applicationService.listByJobId(jobId, page, size));
-        }
-        if (candidateId != null && !candidateId.isBlank()) {
-            return responseFactory.ok(applicationService.listByCandidateId(candidateId, page, size));
-        }
+        String callerSub = requestParser.readUserId(event);
+        if (callerSub == null || callerSub.isBlank())
+            return responseFactory.forbidden("Unable to identify caller");
+        if (jobId != null && !jobId.isBlank())
+            return handleListByJob(jobId, page, size, role, callerSub);
+        if (candidateId != null && !candidateId.isBlank())
+            return handleListByCandidate(candidateId, page, size, role, callerSub);
         return responseFactory.badRequest("Query parameter 'jobId' or 'candidateId' is required");
+    }
+
+    private APIGatewayV2HTTPResponse handleListByJob(String jobId, int page, int size, String role, String callerSub) {
+        if (!ROLE_COMPANY.equals(role))
+            return responseFactory.forbidden("Company access required to list by job");
+        try {
+            Job job = jobService.findById(jobId);
+            Company company = companyService.findByUserId(callerSub);
+            if (job == null || company == null || !company.id().equals(job.companyId()))
+                return responseFactory.forbidden(MSG_ACCESS_DENIED);
+            return responseFactory.ok(applicationService.listByJobId(jobId, page, size));
+        } catch (IllegalArgumentException e) {
+            return responseFactory.badRequest(e.getMessage());
+        }
+    }
+
+    private APIGatewayV2HTTPResponse handleListByCandidate(String candidateId, int page, int size, String role, String callerSub) {
+        if (!ROLE_CANDIDATE.equals(role))
+            return responseFactory.forbidden("Candidate access required to list by candidate");
+        try {
+            Candidate candidate = candidateService.findByUserId(callerSub);
+            if (candidate == null || !candidate.id().equals(candidateId))
+                return responseFactory.forbidden(MSG_ACCESS_DENIED);
+            return responseFactory.ok(applicationService.listByCandidateId(candidateId, page, size));
+        } catch (IllegalArgumentException e) {
+            return responseFactory.badRequest(e.getMessage());
+        }
     }
 
     private APIGatewayV2HTTPResponse handleUpdateStatus(APIGatewayV2HTTPEvent event) {

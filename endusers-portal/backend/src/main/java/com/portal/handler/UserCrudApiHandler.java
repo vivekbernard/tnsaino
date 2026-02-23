@@ -50,6 +50,18 @@ public class UserCrudApiHandler {
         if (body == null || body.isBlank()) return responseFactory.badRequest("Body is required");
         try {
             User user = ApiResponseFactory.objectMapper().readValue(body, User.class);
+            String callerSub = requestParser.readUserId(event);
+            if (callerSub == null || callerSub.isBlank())
+                return responseFactory.forbidden("Unable to identify caller");
+            if (user.id() == null || !callerSub.equals(user.id()))
+                return responseFactory.forbidden("You can only update your own user record");
+            // Load existing record to prevent role/status escalation on update
+            User existing = userService.findById(user.id());
+            if (existing != null) {
+                user = new User(user.id(), user.username(), existing.passwordHash(),
+                        existing.role(), user.linkedEntityId(), existing.status(),
+                        existing.isDeleted(), existing.deletedAt(), user.createdAt());
+            }
             userService.upsert(user);
             return responseFactory.ok(Map.of("message", "User upserted", "user", user));
         } catch (JsonProcessingException e) {
@@ -62,6 +74,9 @@ public class UserCrudApiHandler {
     private APIGatewayV2HTTPResponse handleGet(APIGatewayV2HTTPEvent event) {
         String id = requestParser.readQueryParam(event, "id");
         if (id == null || id.isBlank()) return responseFactory.badRequest("Query parameter 'id' is required");
+        String callerSub = requestParser.readUserId(event);
+        if (callerSub == null || !id.equals(callerSub))
+            return responseFactory.forbidden("You can only access your own user record");
         try {
             User user = userService.findById(id);
             if (user == null) return responseFactory.notFound("User not found");
