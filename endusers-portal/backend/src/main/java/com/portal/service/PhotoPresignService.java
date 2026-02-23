@@ -1,9 +1,12 @@
 package com.portal.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
@@ -14,6 +17,7 @@ import java.time.Duration;
 @Service
 public class PhotoPresignService {
 
+    private static final Logger log = LoggerFactory.getLogger(PhotoPresignService.class);
     private static final Duration URL_EXPIRY = Duration.ofMinutes(15);
     private final String bucket;
     private final Region region;
@@ -95,17 +99,20 @@ public class PhotoPresignService {
     }
 
     private boolean objectExists(String key) {
+        var s3Client = software.amazon.awssdk.services.s3.S3Client.builder()
+                .region(region)
+                .build();
         try {
-            var s3Client = software.amazon.awssdk.services.s3.S3Client.builder()
-                    .region(region)
-                    .build();
             s3Client.headObject(HeadObjectRequest.builder()
                     .bucket(bucket)
                     .key(key)
                     .build());
             return true;
-        } catch (Exception e) {
+        } catch (NoSuchKeyException ignored) {
             return false;
+        } catch (Exception e) {
+            log.error("S3 headObject failed for key '{}': {}", key, e.getMessage(), e);
+            throw e;
         }
     }
 }

@@ -8,6 +8,8 @@ import com.portal.service.CandidateService;
 import com.portal.service.PhotoPresignService;
 import com.portal.util.ApiGatewayRequestParser;
 import com.portal.util.ApiResponseFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -16,6 +18,7 @@ import java.util.Set;
 @Component
 public class CandidateCrudApiHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(CandidateCrudApiHandler.class);
     private static final String ROUTE_PUT_CANDIDATE = "PUT /api/candidate";
     private static final String ROUTE_GET_CANDIDATE = "GET /api/candidate";
     private static final String ROUTE_GET_PHOTO_UPLOAD = "GET /api/candidate/photo/upload-url";
@@ -116,7 +119,8 @@ public class CandidateCrudApiHandler {
             String uploadUrl = photoPresignService.generateUploadUrl(callerSub, contentType);
             return responseFactory.ok(Map.of("uploadUrl", uploadUrl, "key", "candidates/" + callerSub + "/photo"));
         } catch (Exception e) {
-            return responseFactory.serverError("Failed to generate upload URL: " + e.getMessage());
+            log.error("Failed to generate photo upload URL for user '{}'", callerSub, e);
+            return responseFactory.serverError("Failed to generate upload URL");
         }
     }
 
@@ -130,7 +134,8 @@ public class CandidateCrudApiHandler {
             String downloadUrl = photoPresignService.generateDownloadUrl(callerSub);
             return responseFactory.ok(Map.of("downloadUrl", downloadUrl));
         } catch (Exception e) {
-            return responseFactory.serverError("Failed to generate download URL: " + e.getMessage());
+            log.error("Failed to generate photo download URL for user '{}'", callerSub, e);
+            return responseFactory.serverError("Failed to generate download URL");
         }
     }
 

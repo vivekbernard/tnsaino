@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -13,6 +15,7 @@ import java.util.Map;
 @Component
 public class ApiResponseFactory {
 
+    private static final Logger log = LoggerFactory.getLogger(ApiResponseFactory.class);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
             .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -63,6 +66,7 @@ public class ApiResponseFactory {
         try {
             return OBJECT_MAPPER.writeValueAsString(value);
         } catch (JsonProcessingException e) {
+            log.error("Failed to serialize response payload", e);
             return "{\"message\":\"Serialization error\"}";
         }
     }

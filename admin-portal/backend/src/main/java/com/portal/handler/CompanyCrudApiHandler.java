@@ -8,6 +8,8 @@ import com.portal.service.CompanyService;
 import com.portal.service.PhotoPresignService;
 import com.portal.util.ApiGatewayRequestParser;
 import com.portal.util.ApiResponseFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -16,6 +18,7 @@ import java.util.Set;
 @Component
 public class CompanyCrudApiHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(CompanyCrudApiHandler.class);
     private static final String ROUTE_GET_COMPANY = "GET /api/company";
     private static final String ROUTE_GET_COMPANY_LIST = "GET /api/companylist";
     private static final String ROUTE_DELETE_COMPANY = "DELETE /api/company";
@@ -146,7 +149,8 @@ public class CompanyCrudApiHandler {
             String uploadUrl = photoPresignService.generateLogoUploadUrl(userId, contentType);
             return responseFactory.ok(Map.of("uploadUrl", uploadUrl, "key", "companies/" + userId + "/logo"));
         } catch (Exception e) {
-            return responseFactory.serverError("Failed to generate upload URL: " + e.getMessage());
+            log.error("Failed to generate logo upload URL for user '{}'", userId, e);
+            return responseFactory.serverError("Failed to generate upload URL");
         }
     }
 
@@ -160,7 +164,8 @@ public class CompanyCrudApiHandler {
             String downloadUrl = photoPresignService.generateLogoDownloadUrl(userId);
             return responseFactory.ok(Map.of("downloadUrl", downloadUrl));
         } catch (Exception e) {
-            return responseFactory.serverError("Failed to generate download URL: " + e.getMessage());
+            log.error("Failed to generate logo download URL for user '{}'", userId, e);
+            return responseFactory.serverError("Failed to generate download URL");
         }
     }
 

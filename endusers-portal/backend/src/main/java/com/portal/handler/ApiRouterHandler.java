@@ -4,10 +4,14 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
 import com.portal.util.ApiGatewayRequestParser;
 import com.portal.util.ApiResponseFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ApiRouterHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(ApiRouterHandler.class);
 
     private final UserCrudApiHandler userHandler;
     private final CandidateCrudApiHandler candidateHandler;
@@ -56,7 +60,8 @@ public class ApiRouterHandler {
             }
             return responseFactory.notFound("Route not found: " + method + " " + path);
         } catch (Exception e) {
-            return responseFactory.serverError("Internal server error: " + e.getMessage());
+            log.error("Unhandled exception for {} {}", method, path, e);
+            return responseFactory.serverError("Internal server error");
         }
     }
 }

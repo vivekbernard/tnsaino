@@ -7,6 +7,8 @@ import com.portal.service.CandidateService;
 import com.portal.service.PhotoPresignService;
 import com.portal.util.ApiGatewayRequestParser;
 import com.portal.util.ApiResponseFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -15,6 +17,7 @@ import java.util.Set;
 @Component
 public class CandidateCrudApiHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(CandidateCrudApiHandler.class);
     private static final String ROUTE_GET_CANDIDATE = "GET /api/candidate";
     private static final String ROUTE_GET_CANDIDATE_LIST = "GET /api/candidatelist";
     private static final String ROUTE_DELETE_CANDIDATE = "DELETE /api/candidate";
@@ -127,7 +130,8 @@ public class CandidateCrudApiHandler {
             String downloadUrl = photoPresignService.generateDownloadUrl(userId);
             return responseFactory.ok(Map.of("downloadUrl", downloadUrl));
         } catch (Exception e) {
-            return responseFactory.serverError("Failed to generate download URL: " + e.getMessage());
+            log.error("Failed to generate photo download URL for user '{}'", userId, e);
+            return responseFactory.serverError("Failed to generate download URL");
         }
     }
 
