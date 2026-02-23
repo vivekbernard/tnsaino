@@ -1,0 +1,210 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Enduser Portal Backend - Spring Boot Fat Lambda
+
+Parameters:
+  CognitoUserPoolId:
+    Type: String
+    Description: Cognito User Pool ID (Public Pool)
+  CognitoUserPoolClientId:
+    Type: String
+    Description: Cognito User Pool Client ID (Public Pool)
+  DsqlEndpoint:
+    Type: String
+    Description: Aurora DSQL cluster endpoint
+  DsqlDatabase:
+    Type: String
+    Default: postgres
+    Description: Aurora DSQL database name
+  DsqlDbUser:
+    Type: String
+    Default: app_user
+    Description: Aurora DSQL database user
+
+Resources:
+
+  EnduserDepsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: enduser-portal-deps
+      Description: Dependencies for Enduser Portal Lambda
+      ContentUri: target/layer/
+      CompatibleRuntimes:
+        - java17
+
+  EnduserFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: enduser-portal-lambda-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: lambda-logs-and-dsql-access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+              - Effect: Allow
+                Action:
+                  - dsql:DbConnect
+                  - dsql:ExecuteStatement
+                  - dsql:BeginTransaction
+                  - dsql:CommitTransaction
+                  - dsql:RollbackTransaction
+                Resource: "*"
+
+  EnduserHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            IdentitySource: "$request.header.Authorization"
+            JwtConfiguration:
+              issuer: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPoolId}"
+              audience:
+                - !Ref CognitoUserPoolClientId
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+        AllowMethods:
+          - GET
+          - PUT
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+
+  EnduserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: enduser-portal-crud
+      Role: !GetAtt EnduserFunctionRole.Arn
+      Runtime: java17
+      Handler: org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest
+      CodeUri: target/enduser-portal-backend-1.0.0.jar
+      MemorySize: 1769
+      Timeout: 100
+      SnapStart:
+        ApplyOn: PublishedVersions
+      AutoPublishAlias: live
+      Layers:
+        - !Ref EnduserDepsLayer
+      Environment:
+        Variables:
+          MAIN_CLASS: com.portal.Application
+          SPRING_CLOUD_FUNCTION_DEFINITION: apiRouter
+          COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
+          COGNITO_USER_POOL_CLIENT_ID: !Ref CognitoUserPoolClientId
+          DSQL_ENDPOINT: !Ref DsqlEndpoint
+          DSQL_DATABASE: !Ref DsqlDatabase
+          DSQL_DB_USER: !Ref DsqlDbUser
+      Events:
+        # User self-service routes
+        PutUser:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/user
+            Method: PUT
+        GetUser:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/user
+            Method: GET
+
+        # Candidate routes
+        PutCandidate:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/candidate
+            Method: PUT
+        GetCandidate:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/candidate
+            Method: GET
+
+        # Company routes
+        PutCompany:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/company
+            Method: PUT
+        GetCompany:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/company
+            Method: GET
+
+        # Job routes
+        PutJob:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/job
+            Method: PUT
+        GetJob:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/job
+            Method: GET
+        GetJobList:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/joblist
+            Method: GET
+
+        # Job Application routes
+        PutJobApplication:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/jobapplication
+            Method: PUT
+        GetJobApplication:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/jobapplication
+            Method: GET
+        GetJobApplicationList:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/jobapplicationlist
+            Method: GET
+        UpdateJobApplicationStatus:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref EnduserHttpApi
+            Path: /api/jobapplication/status
+            Method: PUT
+
+Outputs:
+  ApiUrl:
+    Description: Enduser API Gateway URL
+    Value: !Sub "https://${EnduserHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+  FunctionArn:
+    Description: Enduser Lambda Function ARN
+    Value: !GetAtt EnduserFunction.Arn

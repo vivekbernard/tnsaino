@@ -1,0 +1,252 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Jobs Portal Admin Backend - Spring Boot Fat Lambda
+
+Parameters:
+  CognitoUserPoolId:
+    Type: String
+    Description: Cognito User Pool ID (Admin Pool)
+  CognitoUserPoolClientId:
+    Type: String
+    Description: Cognito User Pool Client ID (Admin Pool)
+  DsqlEndpoint:
+    Type: String
+    Description: Aurora DSQL cluster endpoint
+  DsqlDatabase:
+    Type: String
+    Default: postgres
+    Description: Aurora DSQL database name
+  DsqlDbUser:
+    Type: String
+    Default: app_user
+    Description: Aurora DSQL database user
+
+Resources:
+
+  AdminDepsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: jobs-portal-admin-deps
+      Description: Dependencies for Admin Portal Lambda
+      ContentUri: target/layer/
+      CompatibleRuntimes:
+        - java17
+
+  AdminFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: jobs-portal-admin-lambda-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: lambda-logs-and-dsql-access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+              - Effect: Allow
+                Action:
+                  - dsql:DbConnect
+                  - dsql:ExecuteStatement
+                  - dsql:BeginTransaction
+                  - dsql:CommitTransaction
+                  - dsql:RollbackTransaction
+                Resource: "*"
+
+  AdminHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            IdentitySource: "$request.header.Authorization"
+            JwtConfiguration:
+              issuer: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPoolId}"
+              audience:
+                - !Ref CognitoUserPoolClientId
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+        AllowMethods:
+          - GET
+          - PUT
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+
+  AdminFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: jobs-portal-admin-crud
+      Role: !GetAtt AdminFunctionRole.Arn
+      Runtime: java17
+      Handler: org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest
+      CodeUri: target/jobs-portal-backend-1.0.0.jar
+      MemorySize: 1769
+      Timeout: 100
+      SnapStart:
+        ApplyOn: PublishedVersions
+      AutoPublishAlias: live
+      Layers:
+        - !Ref AdminDepsLayer
+      Environment:
+        Variables:
+          MAIN_CLASS: com.portal.Application
+          SPRING_CLOUD_FUNCTION_DEFINITION: apiRouter
+          COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
+          COGNITO_USER_POOL_CLIENT_ID: !Ref CognitoUserPoolClientId
+          DSQL_ENDPOINT: !Ref DsqlEndpoint
+          DSQL_DATABASE: !Ref DsqlDatabase
+          DSQL_DB_USER: !Ref DsqlDbUser
+      Events:
+        # User admin routes
+        PutUser:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/user
+            Method: PUT
+        GetUser:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/user
+            Method: GET
+        DeleteUser:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/user
+            Method: DELETE
+        GetUserList:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/userlist
+            Method: GET
+
+        # Candidate admin routes
+        GetCandidate:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/candidate
+            Method: GET
+        DeleteCandidate:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/candidate
+            Method: DELETE
+        GetCandidateList:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/candidatelist
+            Method: GET
+        DisableCandidate:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/candidate/disable
+            Method: PUT
+        EnableCandidate:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/candidate/enable
+            Method: PUT
+
+        # Company admin routes
+        GetCompany:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/company
+            Method: GET
+        DeleteCompany:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/company
+            Method: DELETE
+        GetCompanyList:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/companylist
+            Method: GET
+        DisableCompany:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/company/disable
+            Method: PUT
+        EnableCompany:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/company/enable
+            Method: PUT
+
+        # Job admin routes
+        GetJob:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/job
+            Method: GET
+        DeleteJob:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/job
+            Method: DELETE
+        GetJobList:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/joblist
+            Method: GET
+
+        # Job Application admin routes
+        GetJobApplication:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/jobapplication
+            Method: GET
+        DeleteJobApplication:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/jobapplication
+            Method: DELETE
+        GetJobApplicationList:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AdminHttpApi
+            Path: /api/jobapplicationlist
+            Method: GET
+
+Outputs:
+  ApiUrl:
+    Description: Admin API Gateway URL
+    Value: !Sub "https://${AdminHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+  FunctionArn:
+    Description: Admin Lambda Function ARN
+    Value: !GetAtt AdminFunction.Arn

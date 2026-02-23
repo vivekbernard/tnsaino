@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn clean package:*)",
+      "Bash(npm run build:*)"
+    ],
+    "additionalDirectories": [
+      "F:\\src\\tnsaino\\enduser-backend\\src\\main\\java\\com\\portal",
+      "F:\\src\\tnsaino\\portal\\backend\\src\\main\\java\\com\\portal\\dto",
+      "F:\\src\\tnsaino\\enduser-frontend\\src\\{config,context,api,components,pages",
+      "F:\\src\\tnsaino\\portal\\frontend\\src\\pages\\candidate"
+    ]
+  }
+}

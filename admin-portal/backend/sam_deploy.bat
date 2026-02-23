@@ -1,0 +1,1 @@
+sam deploy --stack-name jobs-portal-admin-stack --capabilities CAPABILITY_NAMED_IAM  --s3-bucket jobs-portal-iac-tsaino --parameter-overrides   CognitoUserPoolId=us-east-1_7rLIqWc2p   CognitoUserPoolClientId=79r068359mr9gaoklt619h8ofa  DsqlEndpoint=xztsdc4rle4zv5v3rb3hwyoebe.dsql.us-east-1.on.aws    DsqlDatabase=postgres DsqlDbUser=app_user
