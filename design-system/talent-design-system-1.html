@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TalentOS — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="talent-design-system.css">
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="layout-nav" aria-label="Main navigation">
+  <div class="nav-logo">
+    Talent<span class="nav-logo-app">OS</span><span class="logo-dot"></span>
+  </div>
+  <div class="nav-right">
+    <button class="nav-icon-btn" title="Search" aria-label="Search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </button>
+    <button class="nav-icon-btn" title="Notifications" aria-label="Notifications">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    </button>
+    <span class="avatar avatar-sm" aria-hidden="true">AK</span>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle dark mode">
+      <span class="toggle-knob"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- SIDEBAR -->
+<div class="layout-wrap">
+<aside class="layout-sidebar" aria-label="Design system navigation">
+  <nav aria-label="Design system sections">
+    <div class="sidebar-section">
+      <div class="sidebar-label" id="sidebar-tokens-label">Design Tokens</div>
+      <a class="sidebar-item active" href="#colors" aria-describedby="sidebar-tokens-label">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+        Colors
+      </a>
+      <a class="sidebar-item" href="#typography">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+        Typography
+      </a>
+      <a class="sidebar-item" href="#spacing">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 6H3"/><path d="M10 12H3"/><path d="M10 18H3"/><polyline points="14 9 17 12 14 15"/><line x1="17" y1="12" x2="17" y2="12"/></svg>
+        Spacing
+      </a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label" id="sidebar-components-label">Components</div>
+      <a class="sidebar-item" href="#buttons">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        Buttons
+      </a>
+      <a class="sidebar-item" href="#inputs">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1"/><polyline points="3 7 12 13 21 7"/></svg>
+        Inputs
+      </a>
+      <a class="sidebar-item" href="#cards">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Cards
+      </a>
+      <a class="sidebar-item" href="#badges">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+        Badges
+      </a>
+      <a class="sidebar-item" href="#data">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg>
+        Tables & Data
+      </a>
+      <a class="sidebar-item" href="#states">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/><path d="M9 12l2 2 4-4"/></svg>
+        States & Feedback
+      </a>
+      <a class="sidebar-item" href="#icons">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Iconography
+      </a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label" id="sidebar-guidelines-label">Guidelines</div>
+      <a class="sidebar-item" href="#guidelines">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Do's & Don'ts
+      </a>
+    </div>
+  </nav>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="layout-main">
+
+  <!-- HERO -->
+  <div class="ds-hero">
+    <div class="ds-hero-bg"></div>
+    <div class="ds-hero-tag">
+      <span class="ds-hero-dot"></span>
+      v1.0 · Design System
+    </div>
+    <h1>TalentOS <span class="accent">Design System</span></h1>
+    <p>A professional, enterprise-grade design language for talent acquisition, candidate discovery, and workforce analytics. Built for scale, clarity, and trust.</p>
+    <div class="hero-pills">
+      <span class="hero-pill">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+        WCAG AA
+      </span>
+      <span class="hero-pill">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>
+        12-Col Grid
+      </span>
+      <span class="hero-pill">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        Dark Mode
+      </span>
+      <span class="hero-pill">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+        4px Base Grid
+      </span>
+      <span class="hero-pill">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Talent-First
+      </span>
+    </div>
+  </div>
+
+  <!-- COLORS -->
+  <section id="colors" class="ds-section">
+    <h2>Color System</h2>
+    <p class="ds-section-subtitle">Structured palette built on trust, efficiency, and hierarchy.</p>
+
+    <h3>Trust Blue — Primary</h3>
+    <p class="ds-block-desc">Core brand color. Used for primary actions, links, and active states.</p>
+    <div class="color-grid">
+      <div class="swatch"><div class="swatch-color" style="background:#0D2B5E"><span class="swatch-check">AA ✓</span></div><div class="swatch-info"><div class="swatch-name">Blue 900</div><div class="swatch-hex">#0D2B5E</div><div class="swatch-usage">Dark brand</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#133A7A"></div><div class="swatch-info"><div class="swatch-name">Blue 800</div><div class="swatch-hex">#133A7A</div><div class="swatch-usage">Hover states</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#1B5FBF"><span class="swatch-check">AA ✓</span></div><div class="swatch-info"><div class="swatch-name">Blue 700 ★</div><div class="swatch-hex">#1B5FBF</div><div class="swatch-usage">Primary CTA</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#2270D4"></div><div class="swatch-info"><div class="swatch-name">Blue 600</div><div class="swatch-hex">#2270D4</div><div class="swatch-usage">Links</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#3182F6"></div><div class="swatch-info"><div class="swatch-name">Blue 500</div><div class="swatch-hex">#3182F6</div><div class="swatch-usage">Dark mode primary</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#5FA1F8"></div><div class="swatch-info"><div class="swatch-name">Blue 400</div><div class="swatch-hex">#5FA1F8</div><div class="swatch-usage">Dark mode hover</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#C6DCFD"></div><div class="swatch-info"><div class="swatch-name">Blue 200</div><div class="swatch-hex">#C6DCFD</div><div class="swatch-usage">Focus rings</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#E3EEFD"></div><div class="swatch-info"><div class="swatch-name">Blue 100</div><div class="swatch-hex">#E3EEFD</div><div class="swatch-usage">Active bg</div></div></div>
+      <div class="swatch"><div class="swatch-color swatch-color-light" style="background:#F0F6FF"></div><div class="swatch-info"><div class="swatch-name">Blue 50</div><div class="swatch-hex">#F0F6FF</div><div class="swatch-usage">Soft tints</div></div></div>
+    </div>
+
+    <h3>Opportunity Amber — Accent</h3>
+    <p class="ds-block-desc">Warm accent for alerts, job tags, and opportunity highlights. Use sparingly.</p>
+    <div class="color-grid">
+      <div class="swatch"><div class="swatch-color" style="background:#D97706"><span class="swatch-check">AA ✓</span></div><div class="swatch-info"><div class="swatch-name">Amber 600</div><div class="swatch-hex">#D97706</div><div class="swatch-usage">Hover</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#F59E0B"></div><div class="swatch-info"><div class="swatch-name">Amber 500 ★</div><div class="swatch-hex">#F59E0B</div><div class="swatch-usage">Urgent, alerts, new</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#FBBF24"></div><div class="swatch-info"><div class="swatch-name">Amber 400</div><div class="swatch-hex">#FBBF24</div><div class="swatch-usage">Micro accents</div></div></div>
+      <div class="swatch"><div class="swatch-color swatch-color-light" style="background:#FEF3C7"></div><div class="swatch-info"><div class="swatch-name">Amber 100</div><div class="swatch-hex">#FEF3C7</div><div class="swatch-usage">Alert bg</div></div></div>
+    </div>
+
+    <h3>Neutral Scale</h3>
+    <p class="ds-block-desc">The UI relies primarily on neutral tones. Blue accents surface meaningful moments.</p>
+    <div class="color-grid">
+      <div class="swatch"><div class="swatch-color" style="background:#111827"><span class="swatch-check">AAA</span></div><div class="swatch-info"><div class="swatch-name">Neutral 900</div><div class="swatch-hex">#111827</div><div class="swatch-usage">Near black</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#1F2937"><span class="swatch-check">AAA</span></div><div class="swatch-info"><div class="swatch-name">Neutral 800</div><div class="swatch-hex">#1F2937</div><div class="swatch-usage">Headings</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#374151"></div><div class="swatch-info"><div class="swatch-name">Neutral 700</div><div class="swatch-hex">#374151</div><div class="swatch-usage">Body text</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#6B7280"></div><div class="swatch-info"><div class="swatch-name">Neutral 500</div><div class="swatch-hex">#6B7280</div><div class="swatch-usage">Secondary text</div></div></div>
+      <div class="swatch"><div class="swatch-color swatch-color-light" style="background:#D1D5DB"></div><div class="swatch-info"><div class="swatch-name">Neutral 300</div><div class="swatch-hex">#D1D5DB</div><div class="swatch-usage">Borders</div></div></div>
+      <div class="swatch"><div class="swatch-color swatch-color-light" style="background:#F3F4F6"></div><div class="swatch-info"><div class="swatch-name">Neutral 100</div><div class="swatch-hex">#F3F4F6</div><div class="swatch-usage">Alt backgrounds</div></div></div>
+      <div class="swatch"><div class="swatch-color swatch-color-light" style="background:#F9FAFB"></div><div class="swatch-info"><div class="swatch-name">Neutral 50</div><div class="swatch-hex">#F9FAFB</div><div class="swatch-usage">Page background</div></div></div>
+    </div>
+
+    <h3>Semantic Colors</h3>
+    <p class="ds-block-desc">Status and feedback colors with dedicated light-mode backgrounds.</p>
+    <div class="color-grid">
+      <div class="swatch"><div class="swatch-color" style="background:#22C55E"><span class="swatch-check">✓</span></div><div class="swatch-info"><div class="swatch-name">Success</div><div class="swatch-hex">#22C55E</div><div class="swatch-usage">Positive states</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#EF4444"><span class="swatch-check">✓</span></div><div class="swatch-info"><div class="swatch-name">Error</div><div class="swatch-hex">#EF4444</div><div class="swatch-usage">Destructive / error</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#F97316"><span class="swatch-check">✓</span></div><div class="swatch-info"><div class="swatch-name">Warning</div><div class="swatch-hex">#F97316</div><div class="swatch-usage">Caution states</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#3182F6"></div><div class="swatch-info"><div class="swatch-name">Info</div><div class="swatch-hex">#3182F6</div><div class="swatch-usage">Neutral info</div></div></div>
+    </div>
+  </section>
+
+  <hr class="ds-divider">
+
+  <!-- TYPOGRAPHY -->
+  <section id="typography" class="ds-section">
+    <h2>Typography</h2>
+    <p class="ds-section-subtitle">Plus Jakarta Sans — Modern professionalism with editorial personality.</p>
+
+    <div class="type-specimen"><span class="type-specimen-label">H1 · 32px</span><span class="type-h1">Senior Product Designer</span></div>
+    <div class="type-specimen"><span class="type-specimen-label">H2 · 24px</span><span class="type-h2">Build your career pipeline</span></div>
+    <div class="type-specimen"><span class="type-specimen-label">H3 · 20px</span><span class="type-h3">Open Positions — Engineering</span></div>
+    <div class="type-specimen"><span class="type-specimen-label">H4 · 16px</span><span class="type-h4">Skills &amp; Qualifications</span></div>
+    <div class="type-specimen"><span class="type-specimen-label">Body · 14px</span><span class="type-body">We're looking for a motivated individual with strong experience in product design and cross-functional collaboration. The ideal candidate thrives in a data-informed environment.</span></div>
+    <div class="type-specimen"><span class="type-specimen-label">Small · 13px</span><span class="type-small">Bangalore, India · Full-time · Posted 2 days ago</span></div>
+    <div class="type-specimen"><span class="type-specimen-label">Caption · 12px</span><span class="type-caption">Last updated: Mar 2025 · Reference: JD-4291</span></div>
+    <div class="type-specimen"><span class="type-specimen-label">Mono · 13px</span><span class="type-mono">--color-primary: #1B5FBF</span></div>
+  </section>
+
+  <hr class="ds-divider">
+
+  <!-- SPACING -->
+  <section id="spacing" class="ds-section">
+    <h2>Spacing Scale</h2>
+    <p class="ds-section-subtitle">4px base unit. Consistent rhythm across all components.</p>
+    <div class="ds-panel">
+      <div class="spacing-row">
+        <div class="spacing-block-wrap"><div class="spacing-block" style="height:4px;"></div><span class="spacing-label">4</span><span class="spacing-label">--space-1</span></div>
+        <div class="spacing-block-wrap"><div class="spacing-block" style="height:8px;"></div><span class="spacing-label">8</span><span class="spacing-label">--space-2</span></div>
+        <div class="spacing-block-wrap"><div class="spacing-block" style="height:12px;"></div><span class="spacing-label">12</span><span class="spacing-label">--space-3</span></div>
+        <div class="spacing-block-wrap"><div class="spacing-block" style="height:16px;"></div><span class="spacing-label">16</span><span class="spacing-label">--space-4</span></div>
+        <div class="spacing-block-wrap"><div class="spacing-block" style="height:20px;"></div><span class="spacing-label">20</span><span class="spacing-label">--space-5</span></div>
+        <div class="spacing-block-wrap"><div class="spacing-block" style="height:24px;"></div><span class="spacing-label">24</span><span class="spacing-label">--space-6</span></div>
+        <div class="spacing-block-wrap"><div class="spacing-block" style="height:32px;"></div><span class="spacing-label">32</span><span class="spacing-label">--space-8</span></div>
+        <div class="spacing-block-wrap"><div class="spacing-block" style="height:40px;"></div><span class="spacing-label">40</span><span class="spacing-label">--space-10</span></div>
+        <div class="spacing-block-wrap"><div class="spacing-block" style="height:48px;"></div><span class="spacing-label">48</span><span class="spacing-label">--space-12</span></div>
+        <div class="spacing-block-wrap"><div class="spacing-block" style="height:64px;"></div><span class="spacing-label">64</span><span class="spacing-label">--space-16</span></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="ds-divider">
+
+  <!-- BUTTONS -->
+  <section id="buttons" class="ds-section">
+    <h2>Buttons</h2>
+    <p class="ds-section-subtitle">Enterprise-grade actions. No pill shapes. Confident, not playful.</p>
+
+    <h3>Variants</h3>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-md">Apply Now</button>
+      <button class="btn btn-secondary btn-md">Save Job</button>
+      <button class="btn btn-ghost btn-md">Cancel</button>
+      <button class="btn btn-danger btn-md">Delete</button>
+      <button class="btn btn-amber btn-md">Post Job</button>
+    </div>
+
+    <h3>Sizes</h3>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-sm">Small</button>
+      <button class="btn btn-primary btn-md">Medium</button>
+      <button class="btn btn-primary btn-lg">Large</button>
+    </div>
+
+    <h3>States</h3>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-md" disabled>Disabled</button>
+      <button class="btn btn-primary btn-md btn-loading"><span class="btn-text">Submitting</span></button>
+      <button class="btn btn-secondary btn-md" disabled>Outline Disabled</button>
+    </div>
+
+    <h3>With Icons</h3>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-md">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Post a Job
+      </button>
+      <button class="btn btn-ghost btn-md">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Export
+      </button>
+      <button class="btn btn-secondary btn-md">
+        View Profile
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <hr class="ds-divider">
+
+  <!-- INPUTS -->
+  <section id="inputs" class="ds-section">
+    <h2>Input Fields</h2>
+    <p class="ds-section-subtitle">Precise, minimal form controls with clear feedback states.</p>
+
+    <div class="input-demo-grid">
+      <div>
+        <div class="input-group">
+          <label class="input-label" for="job-title">Job Title</label>
+          <input class="input" id="job-title" type="text" placeholder="e.g. Senior Engineer">
+          <span class="input-hint">Enter the role you're applying for</span>
+        </div>
+
+        <div class="input-group input-error">
+          <label class="input-label" for="email-input">Email Address</label>
+          <div class="input-icon-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input class="input" id="email-input" type="email" value="invalid@" placeholder="name@company.com" aria-invalid="true" aria-describedby="email-error">
+          </div>
+          <span class="input-msg-error" id="email-error">Please enter a valid email address.</span>
+        </div>
+
+        <div class="input-group input-success">
+          <label class="input-label" for="username-input">Username</label>
+          <input class="input" id="username-input" type="text" value="ananya.kumar" placeholder="Your username" aria-describedby="username-success">
+          <span class="input-msg-success" id="username-success">Username is available!</span>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label" for="search-candidates">Search Candidates</label>
+          <div class="input-icon-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="input search-bar" id="search-candidates" type="search" placeholder="Search by skills, location, role…">
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="input-group">
+          <label class="input-label" for="experience-select">Experience Level</label>
+          <select class="select" id="experience-select">
+            <option>Select experience level</option>
+            <option>Entry Level (0–2 years)</option>
+            <option selected>Mid Level (3–5 years)</option>
+            <option>Senior (5+ years)</option>
+            <option>Lead / Principal</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label" for="skills-input">Required Skills</label>
+          <div class="tag-input-wrap">
+            <span class="tag">React <button class="tag-x" type="button" aria-label="Remove React">×</button></span>
+            <span class="tag">TypeScript <button class="tag-x" type="button" aria-label="Remove TypeScript">×</button></span>
+            <span class="tag">GraphQL <button class="tag-x" type="button" aria-label="Remove GraphQL">×</button></span>
+            <input class="tag-inner-input" id="skills-input" placeholder="Add skill…">
+          </div>
+        </div>
+
+        <fieldset class="input-group">
+          <legend class="input-label">Filter by</legend>
+          <div class="chip-row">
+            <button class="chip chip-active" type="button" aria-pressed="true">Full-time</button>
+            <button class="chip" type="button" aria-pressed="false">Part-time</button>
+            <button class="chip chip-active" type="button" aria-pressed="true">Remote</button>
+            <button class="chip" type="button" aria-pressed="false">Hybrid</button>
+            <button class="chip" type="button" aria-pressed="false">Contract</button>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </section>
+
+  <hr class="ds-divider">
+
+  <!-- CARDS -->
+  <section id="cards" class="ds-section">
+    <h2>Cards</h2>
+    <p class="ds-section-subtitle">Modular content containers for jobs, candidates, and metrics.</p>
+
+    <!-- Metric Cards -->
+    <h3>Dashboard Metrics</h3>
+    <div class="card-grid card-grid-4">
+      <div class="card card-metric">
+        <div class="metric-icon metric-icon-blue">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="metric-value">2,841</div>
+        <div class="metric-label">Active Candidates</div>
+        <div class="metric-delta metric-delta-up">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+          +12.4% vs last month
+        </div>
+      </div>
+      <div class="card card-metric">
+        <div class="metric-icon metric-icon-amber">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--amber-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        </div>
+        <div class="metric-value">148</div>
+        <div class="metric-label">Open Positions</div>
+        <div class="metric-delta metric-delta-up">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+          +8 new this week
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill progress-fill-amber" style="width:63%;"></div></div>
+        </div>
+      </div>
+      <div class="card card-metric">
+        <div class="metric-icon metric-icon-green">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green-700)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="metric-value">94%</div>
+        <div class="metric-label">Offer Accept Rate</div>
+        <div class="metric-delta metric-delta-down">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          −2.1% vs last quarter
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill progress-fill-green" style="width:94%;"></div></div>
+        </div>
+      </div>
+      <div class="card card-metric">
+        <div class="metric-icon metric-icon-blue">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="metric-value">18d</div>
+        <div class="metric-label">Avg. Time-to-Hire</div>
+        <div class="metric-delta metric-delta-up">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+          3 days faster
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Cards -->
+    <h3>Job Listings</h3>
+    <div class="card-grid">
+      <div class="card card-job">
+        <div class="job-header">
+          <div class="company-logo">G</div>
+          <div>
+            <div class="job-title">Product Design Lead</div>
+            <div class="job-company">Google · Bangalore</div>
+          </div>
+        </div>
+        <div class="job-meta">
+          <span class="badge badge-blue">Full-time</span>
+          <span class="badge badge-amber">Remote</span>
+          <span class="badge badge-urgent">Urgent</span>
+        </div>
+        <div class="job-meta">
+          <span class="meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>5–8 years exp.</span>
+          <span class="meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>3 of 5 applied</span>
+        </div>
+        <div class="job-footer">
+          <span class="job-salary">₹32–45 LPA</span>
+          <span class="job-posted">Posted 2d ago</span>
+        </div>
+      </div>
+
+      <div class="card card-job">
+        <div class="job-header">
+          <div class="company-logo company-logo-amber">S</div>
+          <div>
+            <div class="job-title">Senior Backend Engineer</div>
+            <div class="job-company">Stripe · Remote</div>
+          </div>
+        </div>
+        <div class="job-meta">
+          <span class="badge badge-blue">Full-time</span>
+          <span class="badge badge-green">New</span>
+        </div>
+        <div class="job-meta">
+          <span class="meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>6+ years exp.</span>
+          <span class="meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Go, Postgres</span>
+        </div>
+        <div class="job-footer">
+          <span class="job-salary">$130–160k</span>
+          <span class="job-posted">Posted today</span>
+        </div>
+      </div>
+
+      <div class="card card-job">
+        <div class="job-header">
+          <div class="company-logo company-logo-red">N</div>
+          <div>
+            <div class="job-title">Data Scientist II</div>
+            <div class="job-company">Netflix · Los Gatos</div>
+          </div>
+        </div>
+        <div class="job-meta">
+          <span class="badge badge-blue">Full-time</span>
+          <span class="badge badge-gray">On-site</span>
+        </div>
+        <div class="job-meta">
+          <span class="meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>4–6 years exp.</span>
+          <span class="meta-item">Python, ML, SQL</span>
+        </div>
+        <div class="job-footer">
+          <span class="job-salary">$150–185k</span>
+          <span class="job-posted">Posted 5d ago</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Candidate Cards -->
+    <h3>Candidate Profiles</h3>
+    <div class="card-grid">
+      <div class="card card-candidate">
+        <div class="candidate-top">
+          <div class="avatar">AK</div>
+          <div>
+            <div class="candidate-name">Ananya Kumar</div>
+            <div class="candidate-role">Senior Product Designer · 6 yrs</div>
+          </div>
+        </div>
+        <div class="candidate-bio">Ex-Flipkart · IIT Bombay · Bangalore</div>
+        <div class="skill-row">
+          <span class="skill-chip">Figma</span>
+          <span class="skill-chip">Design Systems</span>
+          <span class="skill-chip">Research</span>
+          <span class="skill-chip">Prototyping</span>
+        </div>
+        <div class="candidate-actions">
+          <button class="btn btn-primary btn-sm">Shortlist</button>
+          <button class="btn btn-ghost btn-sm">View Profile</button>
+        </div>
+      </div>
+
+      <div class="card card-candidate">
+        <div class="candidate-top">
+          <div class="avatar avatar-amber">RV</div>
+          <div>
+            <div class="candidate-name">Rahul Verma</div>
+            <div class="candidate-role">Full Stack Engineer · 4 yrs</div>
+          </div>
+        </div>
+        <div class="candidate-bio">Ex-Razorpay · NIT Trichy · Remote</div>
+        <div class="skill-row">
+          <span class="skill-chip">React</span>
+          <span class="skill-chip">Node.js</span>
+          <span class="skill-chip">TypeScript</span>
+          <span class="skill-chip">AWS</span>
+        </div>
+        <div class="candidate-actions">
+          <button class="btn btn-primary btn-sm">Shortlist</button>
+          <button class="btn btn-ghost btn-sm">View Profile</button>
+        </div>
+      </div>
+
+      <!-- Skeleton Loader Card -->
+      <div class="skeleton-card">
+        <div class="sk-row">
+          <div class="skeleton sk-circle"></div>
+          <div class="sk-col">
+            <div class="skeleton sk-h" style="width:60%;"></div>
+            <div class="skeleton sk-h-sm" style="width:45%;"></div>
+          </div>
+        </div>
+        <div class="skeleton sk-h-sm" style="width:75%;margin-bottom:12px;"></div>
+        <div class="sk-row-chips">
+          <div class="skeleton sk-h" style="width:56px;border-radius:4px;"></div>
+          <div class="skeleton sk-h" style="width:72px;border-radius:4px;"></div>
+          <div class="skeleton sk-h" style="width:48px;border-radius:4px;"></div>
+        </div>
+        <div class="sk-row-btns">
+          <div class="skeleton sk-h" style="width:80px;height:30px;border-radius:6px;"></div>
+          <div class="skeleton sk-h" style="width:96px;height:30px;border-radius:6px;"></div>
+        </div>
+        <p class="sk-note">Loading skeleton</p>
+      </div>
+    </div>
+
+    <!-- Notification Cards -->
+    <h3>Notifications</h3>
+    <ul class="notif-list">
+      <li class="notif-item unread">
+        <div class="notif-dot"></div>
+        <div class="notif-body">
+          <div class="notif-msg"><strong>Google</strong> reviewed your application for <strong>Product Design Lead</strong>.</div>
+          <div class="notif-time">2 minutes ago</div>
+        </div>
+        <span class="badge badge-blue flex-shrink-0">New</span>
+      </li>
+      <li class="notif-item unread">
+        <div class="notif-dot notif-dot-amber"></div>
+        <div class="notif-body">
+          <div class="notif-msg">Job alert: <strong>3 new Senior Designer</strong> roles match your preferences.</div>
+          <div class="notif-time">1 hour ago</div>
+        </div>
+        <span class="badge badge-amber flex-shrink-0">Alert</span>
+      </li>
+      <li class="notif-item">
+        <div class="notif-body">
+          <div class="notif-msg">Your profile was viewed by <strong>Stripe</strong> recruiters 5 times this week.</div>
+          <div class="notif-time">Yesterday</div>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <hr class="ds-divider">
+
+  <!-- BADGES -->
+  <section id="badges" class="ds-section">
+    <h2>Badges &amp; Status</h2>
+    <p class="ds-section-subtitle">Concise labels conveying status, type, and priority at a glance.</p>
+
+    <div class="badge-showcase">
+      <span class="badge badge-blue">Full-time</span>
+      <span class="badge badge-amber">Remote</span>
+      <span class="badge badge-green">Available</span>
+      <span class="badge badge-red">Closed</span>
+      <span class="badge badge-gray">On-site</span>
+      <span class="badge badge-urgent">Urgent</span>
+      <span class="badge badge-green">
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        Verified
+      </span>
+      <span class="badge badge-amber">
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Featured
+      </span>
+    </div>
+
+    <h3>Tabs</h3>
+    <div class="tabs" role="tablist">
+      <button class="tab active" role="tab" aria-selected="true">All Jobs</button>
+      <button class="tab" role="tab" aria-selected="false">Saved</button>
+      <button class="tab" role="tab" aria-selected="false">Applied</button>
+      <button class="tab" role="tab" aria-selected="false">Interviews</button>
+      <button class="tab" role="tab" aria-selected="false">Offers</button>
+    </div>
+  </section>
+
+  <hr class="ds-divider">
+
+  <!-- DATA TABLE -->
+  <section id="data" class="ds-section">
+    <h2>Tables &amp; Data</h2>
+    <p class="ds-section-subtitle">Compact, scannable data display with strong header separation.</p>
+
+    <div class="data-layout">
+      <!-- Filter Panel -->
+      <div class="filter-panel">
+        <div class="filter-title">Filters</div>
+        <div class="filter-section">
+          <div class="filter-section-name">Job Type</div>
+          <label class="checkbox-item">
+            <input type="checkbox" checked>
+            <span class="checkbox-visual"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <span class="checkbox-label">Full-time</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" checked>
+            <span class="checkbox-visual"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <span class="checkbox-label">Remote</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox">
+            <span class="checkbox-visual"></span>
+            <span class="checkbox-label">Contract</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox">
+            <span class="checkbox-visual"></span>
+            <span class="checkbox-label">Part-time</span>
+          </label>
+        </div>
+        <div class="filter-section">
+          <div class="filter-section-name">Experience</div>
+          <label class="checkbox-item">
+            <input type="checkbox">
+            <span class="checkbox-visual"></span>
+            <span class="checkbox-label">Entry Level</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" checked>
+            <span class="checkbox-visual"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <span class="checkbox-label">Mid Level</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" checked>
+            <span class="checkbox-visual"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <span class="checkbox-label">Senior</span>
+          </label>
+        </div>
+        <button class="btn btn-ghost btn-sm btn-full">Clear all</button>
+      </div>
+
+      <!-- Table -->
+      <div class="data-main">
+        <div class="table-wrap">
+          <div class="table-header">
+            <span class="table-title">Candidate Pipeline</span>
+            <div class="table-actions">
+              <button class="btn btn-ghost btn-sm">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Export
+              </button>
+              <button class="btn btn-primary btn-sm">+ Add Candidate</button>
+            </div>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Candidate</th>
+                <th>Role</th>
+                <th>Stage</th>
+                <th>Applied</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="td-flex"><div class="avatar avatar-sm">AK</div> Ananya Kumar</div></td>
+                <td>Product Designer</td>
+                <td><span class="badge badge-amber">Interview</span></td>
+                <td class="td-date">Mar 14, 2025</td>
+                <td><div class="progress-bar td-score"><div class="progress-fill" style="width:88%;"></div></div></td>
+              </tr>
+              <tr>
+                <td><div class="td-flex"><div class="avatar avatar-sm avatar-amber">RV</div> Rahul Verma</div></td>
+                <td>Full Stack Eng.</td>
+                <td><span class="badge badge-blue">Screening</span></td>
+                <td class="td-date">Mar 16, 2025</td>
+                <td><div class="progress-bar td-score"><div class="progress-fill" style="width:72%;"></div></div></td>
+              </tr>
+              <tr>
+                <td><div class="td-flex"><div class="avatar avatar-sm avatar-green">MP</div> Meera Pillai</div></td>
+                <td>Data Scientist</td>
+                <td><span class="badge badge-green">Offer</span></td>
+                <td class="td-date">Mar 8, 2025</td>
+                <td><div class="progress-bar td-score"><div class="progress-fill progress-fill-green" style="width:95%;"></div></div></td>
+              </tr>
+              <tr>
+                <td><div class="td-flex"><div class="avatar avatar-sm avatar-neutral">JS</div> James Smith</div></td>
+                <td>Backend Engineer</td>
+                <td><span class="badge badge-red">Rejected</span></td>
+                <td class="td-date">Mar 10, 2025</td>
+                <td><div class="progress-bar td-score"><div class="progress-fill progress-fill-red" style="width:35%;"></div></div></td>
+              </tr>
+              <tr>
+                <td><div class="td-flex"><div class="avatar avatar-sm avatar-purple">PR</div> Priya Rao</div></td>
+                <td>UX Researcher</td>
+                <td><span class="badge badge-gray">Applied</span></td>
+                <td class="td-date">Mar 18, 2025</td>
+                <td><div class="progress-bar td-score"><div class="progress-fill" style="width:60%;"></div></div></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination">
+            <span class="page-info">Showing 1–5 of 284 candidates</span>
+            <div class="page-btns" aria-label="Pagination">
+              <button class="page-btn" aria-label="Previous page">←</button>
+              <button class="page-btn active" aria-current="page">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <button class="page-btn" aria-label="More pages">…</button>
+              <button class="page-btn">57</button>
+              <button class="page-btn" aria-label="Next page">→</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="ds-divider">
+
+  <!-- STATES -->
+  <section id="states" class="ds-section">
+    <h2>States &amp; Feedback</h2>
+    <p class="ds-section-subtitle">Consistent, accessible feedback patterns across the platform.</p>
+
+    <h3>Alerts</h3>
+    <div class="alerts-container">
+      <div class="alert alert-info" role="alert">
+        <svg class="alert-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div><div class="alert-title">Profile Incomplete</div>Add your skills and work history to get 3× more profile views from recruiters.</div>
+      </div>
+      <div class="alert alert-success" role="alert">
+        <svg class="alert-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+        <div><div class="alert-title">Application Submitted</div>Your application to Google has been sent. You'll hear back within 5 business days.</div>
+      </div>
+      <div class="alert alert-warn" role="alert">
+        <svg class="alert-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div><div class="alert-title">Deadline Approaching</div>The application window for Senior Engineer at Stripe closes in 2 days.</div>
+      </div>
+      <div class="alert alert-error" role="alert">
+        <svg class="alert-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <div><div class="alert-title">Upload Failed</div>Resume exceeds 5 MB limit. Please compress and try again.</div>
+      </div>
+    </div>
+
+    <h3>Empty State</h3>
+    <div class="empty-state empty-state-narrow">
+      <div class="empty-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
+      <div class="empty-title">No jobs found</div>
+      <div class="empty-desc">Try adjusting your filters or search terms to find relevant opportunities.</div>
+      <button class="btn btn-primary btn-md">Clear Filters</button>
+    </div>
+  </section>
+
+  <hr class="ds-divider">
+
+  <!-- ICONS -->
+  <section id="icons" class="ds-section">
+    <h2>Iconography</h2>
+    <p class="ds-section-subtitle">Outline style. 1.75px stroke. 20×20 grid. Lucide-compatible.</p>
+
+    <div class="icon-grid">
+      <div class="icon-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        <span class="icon-name">Jobs</span>
+      </div>
+      <div class="icon-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="icon-name">Candidates</span>
+      </div>
+      <div class="icon-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="icon-name">Messages</span>
+      </div>
+      <div class="icon-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="icon-name">Notifications</span>
+      </div>
+      <div class="icon-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="icon-name">Profile</span>
+      </div>
+      <div class="icon-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span class="icon-name">Analytics</span>
+      </div>
+      <div class="icon-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93L17.66 6.34M21 12h-2M17.66 17.66l1.41 1.41M12 21v-2M6.34 17.66l-1.41 1.41M3 12H1M6.34 6.34L4.93 4.93"/><circle cx="12" cy="12" r="8" opacity=".1" fill="currentColor"/></svg>
+        <span class="icon-name">Settings</span>
+      </div>
+      <div class="icon-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span class="icon-name">Search</span>
+      </div>
+      <div class="icon-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span class="icon-name">Shortlist</span>
+      </div>
+      <div class="icon-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span class="icon-name">Location</span>
+      </div>
+      <div class="icon-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="icon-name">Schedule</span>
+      </div>
+      <div class="icon-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span class="icon-name">Resume</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="ds-divider">
+
+  <!-- GUIDELINES -->
+  <section id="guidelines" class="ds-section">
+    <h2>Do's &amp; Don'ts</h2>
+    <p class="ds-section-subtitle">Usage guidelines to maintain design coherence and brand integrity.</p>
+
+    <div class="dos-donts">
+      <div class="do-card">
+        <div class="do-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+          Do
+        </div>
+        <div class="guideline-item">Use Trust Blue (#1B5FBF) for primary CTAs only — never dilute it with decorative use.</div>
+        <div class="guideline-item">Use neutral-heavy layouts; let blue accents surface what matters most.</div>
+        <div class="guideline-item">Maintain 8px radius on cards — not rounder, not sharper.</div>
+        <div class="guideline-item">Apply 150–180ms transitions for all interactive states.</div>
+        <div class="guideline-item">Use amber only for urgency: "Urgent", "New", alerts, job deadlines.</div>
+        <div class="guideline-item">Keep typography tight and hierarchy sharp. Bold for headings, 400 for body.</div>
+        <div class="guideline-item">Use skeletons for async content — never spinners for full-page loads.</div>
+        <div class="guideline-item">Ensure all interactive elements have visible focus rings for keyboard users.</div>
+      </div>
+      <div class="dont-card">
+        <div class="dont-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          Don't
+        </div>
+        <div class="guideline-item">Don't use pill-shaped buttons (border-radius > 10px) — they read as casual, not enterprise.</div>
+        <div class="guideline-item">Don't use blue for decorative borders, dividers, or non-interactive elements.</div>
+        <div class="guideline-item">Don't use amber as a primary brand color or overuse it — it must feel exceptional.</div>
+        <div class="guideline-item">Don't use bounce or spring animations — use ease-out cubic bezier only.</div>
+        <div class="guideline-item">Don't use more than 3 font weights in a single component.</div>
+        <div class="guideline-item">Don't use gradient buttons — flat fills with subtle shadow only.</div>
+        <div class="guideline-item">Don't place text on amber backgrounds below a 4.5:1 contrast ratio.</div>
+        <div class="guideline-item">Don't rely on color alone to convey status — always pair with icons or labels.</div>
+      </div>
+    </div>
+
+    <!-- Motion Guidelines -->
+    <div class="motion-panel">
+      <h3 class="ds-block-title-spaced">Motion Principles</h3>
+      <div class="motion-grid">
+        <div>
+          <div class="motion-title">Duration</div>
+          <div class="motion-desc">Fast: 120ms — Hover, focus rings<br>Normal: 180ms — Buttons, cards<br>Slow: 250–300ms — Panel reveals</div>
+        </div>
+        <div>
+          <div class="motion-title">Easing</div>
+          <div class="motion-desc">Always ease-out (decelerate).<br><span class="motion-mono">cubic-bezier(0.16, 1, 0.3, 1)</span><br>Never bounce. Never spring.</div>
+        </div>
+        <div>
+          <div class="motion-title">Properties</div>
+          <div class="motion-desc">Animate: opacity, transform, box-shadow, background-color, border-color.<br>Never animate: width, height, padding.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dark mode preview note -->
+    <div class="ds-callout">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <span class="ds-callout-text">Toggle dark mode using the switch in the top-right corner to preview all components in dark theme.</span>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="ds-footer">
+    <div class="ds-footer-logo">TalentOS<span class="ds-footer-dot">·</span></div>
+    <div class="ds-footer-text">Design System v1.0 · Built for enterprise talent platforms · WCAG AA Compliant</div>
+  </footer>
+
+</main>
+</div>
+
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+}
+
+// Sidebar click navigation highlight
+document.querySelectorAll('.sidebar-item').forEach(item => {
+  item.addEventListener('click', function(e) {
+    // Let the browser handle the anchor navigation
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    this.closest('.tabs').querySelectorAll('.tab').forEach(t => {
+      t.classList.remove('active');
+      t.setAttribute('aria-selected', 'false');
+    });
+    this.classList.add('active');
+    this.setAttribute('aria-selected', 'true');
+  });
+});
+
+// Chip toggle
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', function() {
+    const isActive = this.classList.toggle('chip-active');
+    this.setAttribute('aria-pressed', isActive);
+  });
+});
+
+// Intersection Observer for sidebar active state (scoped to sections)
+const sections = document.querySelectorAll('.ds-section[id]');
+const navLinks = document.querySelectorAll('.sidebar-item[href^="#"]');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+      });
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+
+sections.forEach(section => observer.observe(section));
+</script>
+</body>
+</html>
