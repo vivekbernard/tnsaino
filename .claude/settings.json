@@ -3,13 +3,15 @@
     "allow": [
       "Bash(mvn clean package:*)",
       "Bash(npm run build:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Read(//c/Users/vivek/.claude/projects/f--src-tnsaino/56d04ab2-2a80-4cdc-a820-1b8cc47532c0/tool-results/**)"
     ],
     "additionalDirectories": [
       "F:\\src\\tnsaino\\enduser-backend\\src\\main\\java\\com\\portal",
       "F:\\src\\tnsaino\\portal\\backend\\src\\main\\java\\com\\portal\\dto",
       "F:\\src\\tnsaino\\enduser-frontend\\src\\{config,context,api,components,pages",
-      "F:\\src\\tnsaino\\portal\\frontend\\src\\pages\\candidate"
+      "F:\\src\\tnsaino\\portal\\frontend\\src\\pages\\candidate",
+      "F:\\src\\tnsaino\\redesign-website\\branding"
     ]
   }
 }
