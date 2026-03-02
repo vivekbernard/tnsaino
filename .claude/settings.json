@@ -4,7 +4,8 @@
       "Bash(mvn clean package:*)",
       "Bash(npm run build:*)",
       "Bash(find:*)",
-      "Read(//c/Users/vivek/.claude/projects/f--src-tnsaino/56d04ab2-2a80-4cdc-a820-1b8cc47532c0/tool-results/**)"
+      "Read(//c/Users/vivek/.claude/projects/f--src-tnsaino/56d04ab2-2a80-4cdc-a820-1b8cc47532c0/tool-results/**)",
+      "Bash(aws s3 cp \"f:/src/tnsaino/websites/v3/\" \"s3://tnsaino-demobucket/\" --recursive)"
     ],
     "additionalDirectories": [
       "F:\\src\\tnsaino\\enduser-backend\\src\\main\\java\\com\\portal",
