@@ -59,13 +59,40 @@
     navHamburger.classList.toggle('nav__hamburger--open');
   });
 
-  // Close mobile menu on link click
+  // Close mobile menu on link click (but not on dropdown toggle)
   allNavLinks.forEach(function (link) {
     link.addEventListener('click', function () {
+      if (link.classList.contains('nav__dropdown-toggle')) return;
       navLinks.classList.remove('nav__links--open');
       navHamburger.classList.remove('nav__hamburger--open');
     });
   });
+
+  // Close mobile menu when a dropdown item is clicked
+  document.querySelectorAll('.nav__dropdown-item').forEach(function (item) {
+    item.addEventListener('click', function () {
+      navLinks.classList.remove('nav__links--open');
+      navHamburger.classList.remove('nav__hamburger--open');
+      dropdown.classList.remove('open');
+    });
+  });
+
+  // Sign Up / Sign In dropdown
+  var dropdown = document.querySelector('.nav__dropdown');
+  var dropdownToggle = document.querySelector('.nav__dropdown-toggle');
+
+  if (dropdownToggle) {
+    dropdownToggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      dropdown.classList.toggle('open');
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove('open');
+      }
+    });
+  }
 
   // Active link tracking on scroll
   const sections = document.querySelectorAll('section[id]');
