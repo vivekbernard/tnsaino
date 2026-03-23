@@ -1,5 +1,5 @@
 /* ============================================================
-   TNSAINO TALENT SOLUTIONS — Interactions
+   TNSAINO TALENT SOLUTIONS - Interactions
    ============================================================ */
 
 (function () {

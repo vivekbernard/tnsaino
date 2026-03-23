@@ -1,11 +1,11 @@
 /* ============================================================
-   TNSAINO TALENT SOLUTIONS — Design System & Styles
+   TNSAINO TALENT SOLUTIONS - Design System & Styles
    Based on talent-design-system v1.0
    ============================================================ */
 
 /* ---------- DESIGN TOKENS (LIGHT) ---------- */
 :root {
-  /* Primary — Trust Blue */
+  /* Primary - Trust Blue */
   --blue-900: #0D2B5E;
   --blue-800: #133A7A;
   --blue-700: #1B5FBF;
@@ -16,7 +16,7 @@
   --blue-100: #E3EEFD;
   --blue-50:  #F0F6FF;
 
-  /* Accent — Opportunity Amber */
+  /* Accent - Opportunity Amber */
   --amber-600: #D97706;
   --amber-500: #F59E0B;
   --amber-400: #FBBF24;
@@ -40,7 +40,7 @@
   --neutral-100: #F3F4F6;
   --neutral-50:  #F9FAFB;
 
-  /* Semantic Aliases — Light */
+  /* Semantic Aliases - Light */
   --bg-page:     #F7F8FA;
   --bg-surface:  #FFFFFF;
   --bg-elevated: #FFFFFF;
@@ -62,7 +62,7 @@
   --color-primary-hover: #133A7A;
   --color-primary-ring:  rgba(27, 95, 191, 0.25);
 
-  /* Spacing — 4px grid */
+  /* Spacing - 4px grid */
   --space-1:  4px;
   --space-2:  8px;
   --space-3:  12px;
