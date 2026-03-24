@@ -25,7 +25,7 @@ echo Done. Objects deleted from s3://%BUCKET%/
 
 echo Copying dist folder to s3://%BUCKET%/
 
-aws s3 cp "v4/" "s3://%BUCKET%/" --recursive
+aws s3 cp "prod/" "s3://%BUCKET%/" --recursive
 
 echo Done. dist folder copied to s3://%BUCKET%/
 
