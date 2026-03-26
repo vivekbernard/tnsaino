@@ -7,7 +7,7 @@ set "timestamp=%dt:~0,4%-%dt:~4,2%-%dt:~6,2%_%dt:~8,2%-%dt:~10,2%-%dt:~12,2%"
 
 set "BUCKET=tnsaino-prod-demobucket"
 set "BACKUP_BUCKET=elantium-website-backups"
-set "DEST_DIR=backup/%timestamp%"
+set "DEST_DIR=customer_backup/tnsaino/%timestamp%"
 set "DEST_EXCLUDE=%BACKUP_BUCKET%/%DEST_DIR%/*"
 set "INVALIDATION_REF=invalidate-%dt:~0,14%-%dt:~15,3%-%random%"
 
