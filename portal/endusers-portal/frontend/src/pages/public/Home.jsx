@@ -1,47 +1,227 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import jobsData from '../../data/jobs.json';
+import './Home.css';
 
-const styles = {
-  hero: { textAlign: 'center', padding: '4rem 2rem' },
-  title: { fontSize: '2.5rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1rem' },
-  subtitle: { fontSize: '1.2rem', color: '#64748b', marginBottom: '2rem', maxWidth: '600px', margin: '0 auto 2rem' },
-  actions: { display: 'flex', gap: '1rem', justifyContent: 'center' },
-  primaryBtn: { padding: '0.75rem 2rem', backgroundColor: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '1rem', cursor: 'pointer', textDecoration: 'none' },
-  secondaryBtn: { padding: '0.75rem 2rem', backgroundColor: '#fff', color: '#2563eb', border: '2px solid #2563eb', borderRadius: '8px', fontSize: '1rem', cursor: 'pointer', textDecoration: 'none' },
-  features: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginTop: '4rem' },
-  card: { padding: '2rem', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' },
-  cardTitle: { fontSize: '1.1rem', fontWeight: '600', marginBottom: '0.5rem', color: '#1e293b' },
-  cardText: { color: '#64748b', fontSize: '0.9rem' },
-};
+const facetConfig = [
+  { key: 'location', label: 'Location' },
+  { key: 'workMode', label: 'Work Mode' },
+  { key: 'type', label: 'Job Type' },
+  { key: 'experienceLevel', label: 'Experience' },
+  { key: 'department', label: 'Function' },
+];
+
+const initialFilters = facetConfig.reduce((accumulator, facet) => {
+  accumulator[facet.key] = [];
+  return accumulator;
+}, {});
+
+const facetOptions = facetConfig.reduce((accumulator, facet) => {
+  accumulator[facet.key] = [...new Set(jobsData.map((job) => job[facet.key]))].sort((left, right) => (
+    left.localeCompare(right)
+  ));
+  return accumulator;
+}, {});
+
+function matchesSearch(job, query) {
+  if (!query.trim()) return true;
+
+  const haystack = [
+    job.title,
+    job.company,
+    job.location,
+    job.workMode,
+    job.type,
+    job.experienceLevel,
+    job.department,
+    job.salary,
+    job.description,
+    ...(job.skills || []),
+  ].join(' ').toLowerCase();
+
+  return haystack.includes(query.trim().toLowerCase());
+}
+
+function matchesFilters(job, filters) {
+  return facetConfig.every((facet) => {
+    const selectedValues = filters[facet.key];
+    return selectedValues.length === 0 || selectedValues.includes(job[facet.key]);
+  });
+}
+
+function getFacetCount(jobs, query, filters, key, value) {
+  return jobs.filter((job) => {
+    if (!matchesSearch(job, query)) return false;
+    if (job[key] !== value) return false;
+
+    return facetConfig.every((facet) => {
+      if (facet.key === key) return true;
+      const selectedValues = filters[facet.key];
+      return selectedValues.length === 0 || selectedValues.includes(job[facet.key]);
+    });
+  }).length;
+}
 
 export default function Home() {
-  return (
-    <div>
-      <div style={styles.hero}>
-        <h1 style={styles.title}>Find Your Dream Job</h1>
-        <p style={styles.subtitle}>
-          Connect with top companies and discover opportunities that match your skills and ambitions.
-        </p>
-        <div style={styles.actions}>
-          <Link to="/jobs" style={styles.primaryBtn}>Browse Jobs</Link>
-          <Link to="/register" style={styles.secondaryBtn}>Get Started</Link>
-        </div>
-      </div>
+  const [query, setQuery] = useState('');
+  const [filters, setFilters] = useState(initialFilters);
 
-      <div style={styles.features}>
-        <div style={styles.card}>
-          <h3 style={styles.cardTitle}>For Candidates</h3>
-          <p style={styles.cardText}>Create your profile, browse open positions, and apply to jobs that match your expertise.</p>
+  const filteredJobs = jobsData.filter((job) => matchesSearch(job, query) && matchesFilters(job, filters));
+  const activeFilters = facetConfig.flatMap((facet) => (
+    filters[facet.key].map((value) => ({ key: facet.key, label: facet.label, value }))
+  ));
+
+  const toggleFilter = (key, value) => {
+    setFilters((current) => {
+      const isSelected = current[key].includes(value);
+      return {
+        ...current,
+        [key]: isSelected
+          ? current[key].filter((item) => item !== value)
+          : [...current[key], value],
+      };
+    });
+  };
+
+  const clearAllFilters = () => {
+    setQuery('');
+    setFilters(initialFilters);
+  };
+
+  return (
+    <div className="home-search-page">
+      <section className="home-search-hero">
+        <div className="home-search-copy">
+          <span className="home-search-eyebrow">Job Search</span>
+          <h1>Find your dream job.</h1>
         </div>
-        <div style={styles.card}>
-          <h3 style={styles.cardTitle}>For Companies</h3>
-          <p style={styles.cardText}>Post job openings, review applicants, and find the perfect candidates for your team.</p>
+
+        <div className="home-search-box">
+          <label className="search-label" htmlFor="job-search-input">Search jobs</label>
+          <input
+            id="job-search-input"
+            className="search-input"
+            type="text"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search by role, company, skill, or keyword"
+          />
+          <div className="search-meta">
+            <span>{filteredJobs.length} roles match your search</span>
+            <span>{jobsData.length} jobs in the local dataset</span>
+          </div>
         </div>
-        <div style={styles.card}>
-          <h3 style={styles.cardTitle}>Easy Management</h3>
-          <p style={styles.cardText}>Track applications, manage job postings, and streamline your hiring process.</p>
+      </section>
+
+      <section className="home-search-layout">
+        <aside className="filter-panel">
+          <div className="filter-panel-header">
+            <div>
+              <p className="filter-title">Filters</p>
+              <p className="filter-subtitle">Faceted search for the mock job dataset.</p>
+            </div>
+            <button type="button" className="clear-button" onClick={clearAllFilters}>
+              Clear all
+            </button>
+          </div>
+
+          {facetConfig.map((facet) => (
+            <div className="filter-group" key={facet.key}>
+              <h2>{facet.label}</h2>
+              <div className="filter-options">
+                {facetOptions[facet.key].map((option) => {
+                  const count = getFacetCount(jobsData, query, filters, facet.key, option);
+                  const checked = filters[facet.key].includes(option);
+
+                  return (
+                    <label className="filter-option" key={option}>
+                      <span className="filter-option-main">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleFilter(facet.key, option)}
+                        />
+                        <span>{option}</span>
+                      </span>
+                      <span className="filter-count">{count}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </aside>
+
+        <div className="results-panel">
+          <div className="results-toolbar">
+            <div>
+              <p className="results-title">Open Roles</p>
+              <p className="results-subtitle">
+                Showing {filteredJobs.length} of {jobsData.length} locally generated listings.
+              </p>
+            </div>
+            <div className="results-chip-row">
+              {query.trim() && (
+                <span className="result-chip">
+                  Keyword: {query.trim()}
+                </span>
+              )}
+              {activeFilters.map((filter) => (
+                <button
+                  type="button"
+                  key={`${filter.key}-${filter.value}`}
+                  className="result-chip result-chip-button"
+                  onClick={() => toggleFilter(filter.key, filter.value)}
+                >
+                  {filter.label}: {filter.value}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="results-scroll">
+            {filteredJobs.length === 0 ? (
+              <div className="empty-state">
+                <h3>No jobs match the current filters.</h3>
+                <p>Try clearing one or more facets or broadening the search keyword.</p>
+              </div>
+            ) : (
+              <div className="results-grid">
+                {filteredJobs.map((job) => (
+                  <article className="job-card" key={job.id}>
+                    <div className="job-card-top">
+                      <div>
+                        <p className="job-company">{job.company}</p>
+                        <h3>{job.title}</h3>
+                      </div>
+                      <span className="job-salary">{job.salary}</span>
+                    </div>
+
+                    <div className="job-meta-row">
+                      <span>{job.location}</span>
+                      <span>{job.workMode}</span>
+                      <span>{job.type}</span>
+                    </div>
+
+                    <div className="job-meta-row job-meta-secondary">
+                      <span>{job.experienceLevel}</span>
+                      <span>{job.department}</span>
+                      <span>Posted {job.postedDaysAgo}d ago</span>
+                    </div>
+
+                    <p className="job-description">{job.description}</p>
+
+                    <div className="job-skills">
+                      {job.skills.map((skill) => (
+                        <span className="skill-pill" key={`${job.id}-${skill}`}>{skill}</span>
+                      ))}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
